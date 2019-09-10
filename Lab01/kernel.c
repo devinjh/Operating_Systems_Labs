@@ -39,12 +39,23 @@ void main()
 void printString(char* c, int d)
 {
 	int i = 0;
-	while ((*c) != '\0')
+	if (d == 1)
 	{
-		char al = *c++;
-		char ah = 14;
-		int ax = ah * 256 + al;
-		interrupt(16, ax, 0, 0, 0);
+        	while ((*c) != '\0')
+        	{
+                	interrupt(23, *c, 0, 0, 0);
+			*c++;
+        	}
+	}
+	else
+	{
+        	while ((*c) != '\0')
+        	{
+                	char al = *c++;
+                	char ah = 14;
+                	int ax = ah * 256 + al;
+                	interrupt(16, ax, 0, 0, 0);
+        	}
 	}
 
 	return;
