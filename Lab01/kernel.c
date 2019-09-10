@@ -38,8 +38,11 @@ void main()
 
 void printString(char* c, int d)
 {
-   /* fill this in */
-   return;
+	char al = *c;
+	char ah = 14;
+	int ax = ah * 256 + al;
+	interrupt(16, ax, 0, 0, 0);
+	return;
 }
 
 void printLogo()
@@ -64,12 +67,56 @@ void printLogo()
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
-   return;
-/*   switch(ax) {  */
-/*      case 0:  */
-/*      case 1: case 2: case 3: case 4: case 5: */
-/*      case 6: case 7: case 8: case 9: case 10: */
-/*      case 11: case 12: case 13: case 14: case 15: */
-/*      default: printString("General BlackDOS error.\r\n\0"); */
-/*   }  */
+   switch(ax) {
+      case 0:
+	      //
+	      break;
+      case 1:
+	      //
+	      break;
+      case 2:
+	      //
+	      break;
+      case 3:
+	      //
+	      break;
+      case 4:
+	      //
+	      break;
+      case 5:
+	      //
+	      break;
+      case 6:
+	      //
+	      break;
+      case 7:
+	      //
+	      break;
+      case 8:
+	      //
+	      break;
+      case 9:
+	      //
+	      break;
+      case 10:
+	      //
+	      break;
+      case 11:
+	      //
+	      break;
+      case 12:
+	      //
+	      break;
+      case 13:
+	      //
+	      break;
+      case 14:
+	      //
+	      break;
+      case 15:
+	      //
+	      break;
+      default:
+	      printString("General BlackDOS error.\r\n\0");
+   }
 }
