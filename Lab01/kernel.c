@@ -25,14 +25,13 @@
 /* 3460:4/526 BlackDOS2020 kernel, Version 1.03, Fall 2019.               */
 
 void handleInterrupt21(int,int,int,int);
-void printString(char*,int);
 void printLogo();
 
 void main()
 {
    makeInterrupt21();
    printLogo();
-   printString("Hello world from your name.\r\n\0",1);
+   interrupt(33,0,"Hello world from Devin H, Tristan H, and Andrew R.\r\n\0",1,0);
    while(1);
 }
 
@@ -70,7 +69,7 @@ void printLogo()
    printString("   //   \\\\        | |_) | | (_| | (__|   <| |__| | |__| |____) |\r\n\0",0);
    printString("._/'     `\\.      |____/|_|\\__,_|\\___|_|\\_\\_____/ \\____/|_____/\r\n\0",0);
    printString(" BlackDOS2020 v. 1.03, c. 2019. Based on a project by M. Black. \r\n\0",0);
-   printString(" Author(s): your name(s) here.\r\n\r\n\0",0);
+   printString(" Author(s): Devin H, Tristan H, Andrew R.\r\n\r\n\0",0);
 }
 
 /* MAKE FUTURE UPDATES HERE */
@@ -85,9 +84,9 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
    switch(ax) {
       case 0:
-	      //
+	      printString(bx, cx);
 	      break;
-      case 1:
+      /*case 1:
 	      //
 	      break;
       case 2:
@@ -131,7 +130,7 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
 	      break;
       case 15:
 	      //
-	      break;
+	      break;*/
       default:
 	      printString("General BlackDOS error.\r\n\0");
    }
