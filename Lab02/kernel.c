@@ -167,9 +167,6 @@ void printString(char *c, int d)
       c++;
     }
     break;
-  case 2:/* print a single character to the console*/
-    interrupt(16, 14 * 256 + *c, 0, 0, 0);
-    break;
   }
   return;
 }
