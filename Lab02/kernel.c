@@ -75,7 +75,7 @@ void writeInt(int n, int cx)
   char numToPrint[6];/* All are 5 digit numbers*/
   int i;
 
-  numToPrint[6] = '\0';
+  numToPrint[5] = '\0';
   for(i = 4; i >= 0; --i) {
     numToPrint[i] = mod(n, 10) + 48;
     n = div(n, 10);
