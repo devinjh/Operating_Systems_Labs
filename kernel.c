@@ -107,6 +107,14 @@ void writeInt(int n, int cx)
   int x = n;
   int end = 0;
 
+  if(int n == 0)/* Special case where n == 0*/
+  {
+    numToPrint[0] = 48;
+    numToPrint[1] = '\0';
+    interrupt(33,0,numToPrint,cx,0);
+    return;
+  }
+
   while(x != 0) {
     x = div(x, 10);
     ++end;
