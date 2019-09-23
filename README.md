@@ -24,6 +24,7 @@ string buffer = "1025\0"
 integer n = 0
 
 Progression of n is as follows:
+
 	iteration 1
 	multiply by 10     n = 0
 	add next integer   n = 1
@@ -51,6 +52,7 @@ example:
  return string = "      "
 
  divive the integer by 10 until it reaches zero, incriment size each time
+
  	divive by 10 n = 123
  	size = 1
 
@@ -68,6 +70,7 @@ example:
  	string = "    '\0' "
 
  from right to left, fill the string with the ones place of the integer, then divide by 10
+ 
  	using mod(n,10) string = "   4'\0' "
  	using div(n,10  n = 123
 
