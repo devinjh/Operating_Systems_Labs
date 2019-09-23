@@ -92,12 +92,17 @@ void readInt(int *n)
 
   *n = 0;
   i = 0;
-  while(buffer[i] != '\0') {
-    *n *= 10;
-    *n += buffer[i] - 48;
-    ++i;
+  while(buffer[i] != '\0') {/* while we are not at the end of the string*/
+    /* if the char is not between 0-9 (inclusive) then it is garbage input && we should return immediately*/
+    if(!((buffer[i] - 48) >= 0 && (buffer[i] - 48) <= 9)) {
+      *n = 0;
+      return;
+    }
+    *n *= 10;/* shifts all the numbers to the left one decimal place*/
+    *n += buffer[i] - 48;/* put the move recent number in the ones place*/
+    ++i;/* move to the next char to process*/
   }
-
+  return;
 }
 
 void writeInt(int n, int cx)
@@ -107,11 +112,10 @@ void writeInt(int n, int cx)
   int x = n;
   int end = 0;
 
-  if(n == 0)/* Special case where n == 0*/
-  {
-    numToPrint[0] = 48;
+  if(n == 0) { /* Special case where n == 0*/
+    numToPrint[0] = 48; /* zero in asci*/
     numToPrint[1] = '\0';
-    interrupt(33,0,numToPrint,cx,0);
+    interrupt(33, 0, numToPrint, cx, 0);
     return;
   }
 
@@ -127,6 +131,7 @@ void writeInt(int n, int cx)
   }
 
   interrupt(33, 0, numToPrint, cx, 0);
+  return;
 }
 
 /* read string expects buffer to be an empty char[80]*/
@@ -136,27 +141,29 @@ void readString(char *buffer)
   char *input;
 
   while(i != 79) {
-    input = interrupt(22, 0, 0, 0, 0);
+    *input = interrupt(22, 0, 0, 0, 0);
 
-    if(input == 0xD) { /* if return key is pressed*/
-      buffer[i] = '\0';/* add 0x0 to the end of the string */
+    switch(*input) {
+    case 0xD:/* if [ENTER] is pressed*/
+      buffer[i] = '\0';/* add NULL Terminator to the end of the buffer */
       interrupt(16, 14 * 256 + '\n', 0, 0, 0);/* print new line*/
       interrupt(16, 14 * 256 + '\r', 0, 0, 0);/* return to the beginning of the line*/
       return;
-    }
-    else if(input == 0x8 && i > 0) {  /* if backspace was pressed*/
-      interrupt(16,  14 * 256 + input, 0, 0, 0); /* print backspace (move the cursor back)*/
-      i--; /* go to last char in the buffer*/
-      buffer[i] = ' '; /* change it to a space*/
+    case 0x8:  /* if backspace was pressed and the buffer is not empty*/
+      if(i < 1)break;
+      interrupt(16,  14 * 256 + *input, 0, 0, 0); /* print backspace (move the cursor back)*/
+      i--; /* go one char back in the buffer*/
+      buffer[i] = ' '; /* change it to a space, not technically needed*/
       interrupt(16,  14 * 256 + buffer[i], 0, 0, 0); /* print the space (this looks clean)*/
-      interrupt(16, 14 * 256 + input, 0, 0, 0); /* move the cursor back again*/
-    }
-    else if(input != 0x0) {
-      interrupt(16,  14 * 256 + input, 0, 0, 0);
-      buffer[i] = input;
-      i++;
+      interrupt(16, 14 * 256 + *input, 0, 0, 0); /* move the cursor back again*/
+      break;
+    default:
+      interrupt(16,  14 * 256 + *input, 0, 0, 0);/* print the char to the console*/
+      buffer[i] = *input;/* save the char in the buffer*/
+      i++;/* move to the next spot in the buffer*/
     }
   }
+
   interrupt(16, 14 * 256 + '\n', 0, 0, 0);/* print new line*/
   interrupt(16, 14 * 256 + '\r', 0, 0, 0);/* return to the beginning of the line*/
   buffer[79] = '\0'; /* if you read 79 characters, set 80 to '\0' */
@@ -213,6 +220,6 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     readInt(bx);
     break;
   default:
-    printString("General BlackDOS error.\r\n\0", 0);
+    interrupt(33, 0, "General BlackDOS error.\r\n\0", 0, 0);
   }
 }
