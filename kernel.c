@@ -107,7 +107,7 @@ void writeInt(int n, int cx)
   int x = n;
   int end = 0;
 
-  if(int n == 0)/* Special case where n == 0*/
+  if(n == 0)/* Special case where n == 0*/
   {
     numToPrint[0] = 48;
     numToPrint[1] = '\0';
