@@ -20,10 +20,10 @@ Creating readInt:
 Read int begins by calling readString and then processes that string into an integer, which is stored into the integer that is passed as an parameter. Whenever an "error" is found, the integer is set to zero and the function returns. This can be thought of as an error value. However, this ideology constrains the user implimentation when zero is a valid input. While the string buffer is filled with valid integers, the integers are placed in the ones place of the return variable "n". Whenever a new integer is placed, first all the existing integers are shifted to the left one decimal place by multiplying by 10.
 
 example:
-string buffer = "1025\0"
-integer n = 0
+	string buffer = "1025\0"
+	integer n = 0
 
-Progression of n is as follows:
+	Progression of n is as follows:
 
 	iteration 1
 	multiply by 10     n = 0
@@ -47,11 +47,11 @@ Creating writeInt:
 Write int has a slightly simpler implimentation than readInt since the parameters do not need to be checked. Since an integer can only be up to 5 digits long, we create a character array that is 6 long (one extra slot for the NULL terminator). There is also one special case when writing an integer, that is when the integer is equal to zero. Therefore, first we check if the integer is zero, if it is we print it and return. If the integer is not zero we need to check how many digits it is. This is done in a while loop, where we continously divide by 10 until the number is zero. We then use this new information to set the NULL terminator. Finally we fill the rest of the string from right to left with the ones place of the integer. Then divide by 10 to shift each integer to the right by one decimal place.
 
 example:
- integer to write, n = 1234
- integer size = 0
- return string = "      "
+ 	integer to write, n = 1234
+	 integer size = 0
+ 	return string = "      "
 
- divive the integer by 10 until it reaches zero, incriment size each time
+ 	divive the integer by 10 until it reaches zero, incriment size each time
 
  	divive by 10 n = 123
  	size = 1
