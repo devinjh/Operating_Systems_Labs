@@ -203,6 +203,21 @@ int div(int a, int b)
   return (q - 1);
 }
 
+void readSector(int bx, int cx, int dx)
+{
+  // to do
+}
+
+void writeSector(int bx, int cx, int dx)
+{
+  // to do
+}
+
+void clearScreen(bx, cx)
+{
+  // to do
+}
+
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
   //return;
@@ -212,6 +227,15 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     break;
   case 1:
     readString(bx);
+    break;
+  case 2:
+    readSector(bx, cx, dx);
+    break;
+  case 6:
+    writeSector(bx, cx, dx);
+    break;
+  case 12:
+    clearScreen(bx, cx);
     break;
   case 13:
     writeInt(bx, cx);
