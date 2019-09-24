@@ -192,9 +192,21 @@ void readSector(char* buffer, int sector, int sectorCount)
   interrupt(19, 512 + sectorCount, buffer, trackNo * 256 + relSecNo, headNo * 256);
 }
 
-void writeSector(int bx, int cx, int dx)
+void writeSector(char* buffer, int sector, int sectorCount)
 {
-  // to do
+  // Notes
+  //
+  // Variables
+  // 33
+  // ax = 768 + sectorCount
+  // bx = buffer
+  // cx = trackNo * 256 + relSecNo
+  // dx = headNo * 256
+
+  int relSecNo = mod(sector, 18) + 1;
+  int headNo = mod(div(sector, 18), 2);
+  int trackNo = div(sector, 36);
+  interrupt(19, 768 + sectorCount, buffer, trackNo * 256 + relSecNo, headNo * 256);
 }
 
 void clearScreen(bx, cx)
