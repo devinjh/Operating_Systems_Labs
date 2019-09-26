@@ -216,18 +216,22 @@ void clearScreen(bx, cx)
 {
   int i = 0;
 
-  while( i < 25 ) {
+  while( i < 24 ) {
     interrupt(16, 14 * 256 + '\n', 0, 0, 0); /* print new line */
     interrupt(16, 14 * 256 + '\r', 0, 0, 0); /* return to the beginning of the line */
     i++;
   }
 
-  interrupt(16, 2*256, 0, 0, 0);
+  interrupt(16, 2*256, 0, 0, 0); /* places cursor in top left corner */
 
-  if (bx > 0 && cx > 0) {
+  /* AH = 6, indicating function 6;
+     AL = 0, meaning scroll whole screen or window;
+     BH = the attribute byte for blank lines, explained next;
+     CH and CL are the row and column for the upper left-hand corner of the window (0,0); and
+     DH and DL are the row and column for the lower right-hand corner, (24,79). */
+  if (bx > 0 && bx < 8 && cx > 0 && cx < 16) {
     interrupt(16, 6*256, 4096 * (bx - 1) + 256 * (cx - 1), 0, 6223); 
   }
-
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
