@@ -30,8 +30,13 @@ void printLogo();
 void main()
 {
   /* Lab 3 */
-  char buffer[512];
+  char buffer[512];  int i;
   makeInterrupt21();
+  for (i = 0; i < 512; i++) buffer[i] = 0;
+  buffer[0] = 1;
+  buffer[1] = 14;
+  interrupt(33,6,buffer,258,1);
+  interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
   printLogo();
   interrupt(33,2,buffer,30,1);
   interrupt(33,0,buffer,0,0);
@@ -209,7 +214,20 @@ void writeSector(char* buffer, int sector, int sectorCount)
 
 void clearScreen(bx, cx)
 {
-  /* TODO */
+  int i = 0;
+
+  while( i < 25 ) {
+    interrupt(16, 14 * 256 + '\n', 0, 0, 0); /* print new line */
+    interrupt(16, 14 * 256 + '\r', 0, 0, 0); /* return to the beginning of the line */
+    i++;
+  }
+
+  interrupt(16, 2*256, 0, 0, 0);
+
+  if (bx > 0 && cx > 0) {
+    interrupt(16, 6*256, 4096 * (bx - 1) + 256 * (cx - 1), 0, 6223); 
+  }
+
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
