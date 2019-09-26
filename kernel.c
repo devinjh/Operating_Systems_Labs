@@ -29,7 +29,7 @@ void printLogo();
 
 void main()
 {
-  // Lab 3
+  /* Lab 3 */
   char buffer[512];
   makeInterrupt21();
   printLogo();
@@ -56,32 +56,32 @@ void readInt(int *n)
   char buffer[80];
   int i;
   for(i = 0; i < 80; ++i)buffer[i] = 0;
-  interrupt(33, 1, buffer, 0, 0); /* read in string, to be converted*/
+  interrupt(33, 1, buffer, 0, 0); /* read in string, to be converted */
 
   *n = 0;
   i = 0;
-  while(buffer[i] != '\0') {/* while we are not at the end of the string*/
-    /* if the char is not between 0-9 (inclusive) then it is garbage input && we should return immediately*/
+  while(buffer[i] != '\0') { /* while we are not at the end of the string */
+    /* if the char is not between 0-9 (inclusive) then it is garbage input && we should return immediately */
     if(!((buffer[i] - 48) >= 0 && (buffer[i] - 48) <= 9)) {
       *n = 0;
       return;
     }
-    *n *= 10;/* shifts all the numbers to the left one decimal place*/
-    *n += buffer[i] - 48;/* put the move recent number in the ones place*/
-    ++i;/* move to the next char to process*/
+    *n *= 10; /* shifts all the numbers to the left one decimal place */
+    *n += buffer[i] - 48; /* put the move recent number in the ones place */
+    ++i; /* move to the next char to process */
   }
   return;
 }
 
 void writeInt(int n, int cx)
 {
-  char numToPrint[6];/* All are 5 digit numbers*/
+  char numToPrint[6]; /* All are 5 digit numbers */
   int i;
   int x = n;
   int end = 0;
 
-  if(n == 0) { /* Special case where n == 0*/
-    numToPrint[0] = 48; /* zero in asci*/
+  if(n == 0) { /* Special case where n == 0 */
+    numToPrint[0] = 48; /* zero in asci */
     numToPrint[1] = '\0';
     interrupt(33, 0, numToPrint, cx, 0);
     return;
@@ -102,7 +102,7 @@ void writeInt(int n, int cx)
   return;
 }
 
-/* read string expects buffer to be an empty char[80]*/
+/* read string expects buffer to be an empty char[80] */
 void readString(char *buffer)
 {
   int i = 0;
@@ -112,28 +112,28 @@ void readString(char *buffer)
     *input = interrupt(22, 0, 0, 0, 0);
 
     switch(*input) {
-    case 0xD:/* if [ENTER] is pressed*/
-      buffer[i] = '\0';/* add NULL Terminator to the end of the buffer */
-      interrupt(16, 14 * 256 + '\n', 0, 0, 0);/* print new line*/
-      interrupt(16, 14 * 256 + '\r', 0, 0, 0);/* return to the beginning of the line*/
+    case 0xD: /* if [ENTER] is pressed */
+      buffer[i] = '\0'; /* add NULL Terminator to the end of the buffer */
+      interrupt(16, 14 * 256 + '\n', 0, 0, 0);/* print new line */
+      interrupt(16, 14 * 256 + '\r', 0, 0, 0);/* return to the beginning of the line */
       return;
-    case 0x8:  /* if backspace was pressed and the buffer is not empty*/
+    case 0x8:  /* if backspace was pressed and the buffer is not empty */
       if(i < 1)break;
-      interrupt(16,  14 * 256 + *input, 0, 0, 0); /* print backspace (move the cursor back)*/
-      i--; /* go one char back in the buffer*/
-      buffer[i] = ' '; /* change it to a space, not technically needed*/
-      interrupt(16,  14 * 256 + buffer[i], 0, 0, 0); /* print the space (this looks clean)*/
-      interrupt(16, 14 * 256 + *input, 0, 0, 0); /* move the cursor back again*/
+      interrupt(16,  14 * 256 + *input, 0, 0, 0); /* print backspace (move the cursor back) */
+      i--; /* go one char back in the buffer */
+      buffer[i] = ' '; /* change it to a space, not technically needed */
+      interrupt(16,  14 * 256 + buffer[i], 0, 0, 0); /* print the space (this looks clean) */
+      interrupt(16, 14 * 256 + *input, 0, 0, 0); /* move the cursor back again */
       break;
     default:
-      interrupt(16,  14 * 256 + *input, 0, 0, 0);/* print the char to the console*/
-      buffer[i] = *input;/* save the char in the buffer*/
-      i++;/* move to the next spot in the buffer*/
+      interrupt(16,  14 * 256 + *input, 0, 0, 0); /* print the char to the console */
+      buffer[i] = *input; /* save the char in the buffer */
+      i++; /* move to the next spot in the buffer */
     }
   }
 
-  interrupt(16, 14 * 256 + '\n', 0, 0, 0);/* print new line*/
-  interrupt(16, 14 * 256 + '\r', 0, 0, 0);/* return to the beginning of the line*/
+  interrupt(16, 14 * 256 + '\n', 0, 0, 0); /* print new line */
+  interrupt(16, 14 * 256 + '\r', 0, 0, 0); /* return to the beginning of the line */
   buffer[79] = '\0'; /* if you read 79 characters, set 80 to '\0' */
   return;
 }
@@ -141,13 +141,13 @@ void readString(char *buffer)
 void printString(char *c, int d)
 {
   switch(d) {
-  case 0:/* print to the console*/
+  case 0: /* print to the console */
     while(*c != '\0') {
       interrupt(16, 14 * 256 + *c, 0, 0, 0);
       c++;
     }
     break;
-  case 1:/* print to the printer*/
+  case 1: /* print to the printer */
     while(*c != '\0') {
       interrupt(23, *c, 0, 0, 0);
       c++;
@@ -173,18 +173,16 @@ int div(int a, int b)
 
 void readSector(char* buffer, int sector, int sectorCount)
 {
-  // Notes
-  //
-  // The variable sector is the absolute sector
+  /* Notes */
   
-  // Reading in the sector
-  //
-  // Variables
-  // 19
-  // ax = 512 + sectorCount
-  // bx = buffer
-  // cx = trackNo * 256 + relSecNo
-  // dx = headNo * 256
+  /* The variable sector is the absolute sector */
+  /* Reading in the sector */
+  /* Variables */
+  /* 19 */
+  /* ax = 512 + sectorCount */
+  /* bx = buffer */
+  /* cx = trackNo * 256 + relSecNo */
+  /* dx = headNo * 256 */
   
   int relSecNo = mod(sector, 18) + 1;
   int headNo = mod(div(sector, 18), 2);
@@ -194,14 +192,13 @@ void readSector(char* buffer, int sector, int sectorCount)
 
 void writeSector(char* buffer, int sector, int sectorCount)
 {
-  // Notes
-  //
-  // Variables
-  // 33
-  // ax = 768 + sectorCount
-  // bx = buffer
-  // cx = trackNo * 256 + relSecNo
-  // dx = headNo * 256
+  /* Notes */
+  /* Variables */
+  /* 33 */
+  /* ax = 768 + sectorCount */
+  /* bx = buffer */
+  /* cx = trackNo * 256 + relSecNo */
+  /* dx = headNo * 256 */
 
   int relSecNo = mod(sector, 18) + 1;
   int headNo = mod(div(sector, 18), 2);
@@ -211,12 +208,12 @@ void writeSector(char* buffer, int sector, int sectorCount)
 
 void clearScreen(bx, cx)
 {
-  // to do
+  /* TODO */
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
-  //return;
+  /* return; */
   switch(ax) {
   case 0:
     printString(bx, cx);
