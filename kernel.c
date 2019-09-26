@@ -176,7 +176,7 @@ void readSector(char* buffer, int sector, int sectorCount)
   /* Notes */
   
   /* The variable sector is the absolute sector */
-  /* Reading in the sector */
+  /* Reading in the sector ah = 2 */
   /* Variables */
   /* 19 */
   /* ax = 512 + sectorCount */
@@ -193,6 +193,7 @@ void readSector(char* buffer, int sector, int sectorCount)
 void writeSector(char* buffer, int sector, int sectorCount)
 {
   /* Notes */
+  /* Writing in sector ah = 3 */
   /* Variables */
   /* 33 */
   /* ax = 768 + sectorCount */
