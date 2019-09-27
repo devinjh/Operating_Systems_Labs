@@ -56,58 +56,27 @@ void printLogo()
   interrupt(33, 0, " Author(s): Andrew Robinson, Tristan Hess, Devin Hopkins.\r\n\r\n\0", 0);
 }
 
-void readInt(int *n)
+/* ax = 0 */
+void printString(char *c, int d)
 {
-  char buffer[80];
-  int i;
-  for(i = 0; i < 80; ++i)buffer[i] = 0;
-  interrupt(33, 1, buffer, 0, 0); /* read in string, to be converted */
-
-  *n = 0;
-  i = 0;
-  while(buffer[i] != '\0') { /* while we are not at the end of the string */
-    /* if the char is not between 0-9 (inclusive) then it is garbage input && we should return immediately */
-    if(!((buffer[i] - 48) >= 0 && (buffer[i] - 48) <= 9)) {
-      *n = 0;
-      return;
+  switch(d) {
+  case 0: /* print to the console */
+    while(*c != '\0') {
+      interrupt(16, 14 * 256 + *c, 0, 0, 0);
+      c++;
     }
-    *n *= 10; /* shifts all the numbers to the left one decimal place */
-    *n += buffer[i] - 48; /* put the move recent number in the ones place */
-    ++i; /* move to the next char to process */
+    break;
+  case 1: /* print to the printer */
+    while(*c != '\0') {
+      interrupt(23, *c, 0, 0, 0);
+      c++;
+    }
+    break;
   }
   return;
 }
 
-void writeInt(int n, int cx)
-{
-  char numToPrint[6]; /* All are 5 digit numbers */
-  int i;
-  int x = n;
-  int end = 0;
-
-  if(n == 0) { /* Special case where n == 0 */
-    numToPrint[0] = 48; /* zero in asci */
-    numToPrint[1] = '\0';
-    interrupt(33, 0, numToPrint, cx, 0);
-    return;
-  }
-
-  while(x != 0) {
-    x = div(x, 10);
-    ++end;
-  }
-
-  numToPrint[end] = '\0';
-  for(i = end - 1; i >= 0; --i) {
-    numToPrint[i] = mod(n, 10) + 48;
-    n = div(n, 10);
-  }
-
-  interrupt(33, 0, numToPrint, cx, 0);
-  return;
-}
-
-/* read string expects buffer to be an empty char[80] */
+/* ax = 1 */
 void readString(char *buffer)
 {
   int i = 0;
@@ -143,48 +112,7 @@ void readString(char *buffer)
   return;
 }
 
-void printString(char *c, int d)
-{
-  switch(d) {
-  case 0: /* print to the console */
-    while(*c != '\0') {
-      interrupt(16, 14 * 256 + *c, 0, 0, 0);
-      c++;
-    }
-    break;
-  case 1: /* print to the printer */
-    while(*c != '\0') {
-      interrupt(23, *c, 0, 0, 0);
-      c++;
-    }
-    break;
-  }
-  return;
-}
-
-int mod(int a, int b)
-{
-  int x = a;
-  while (x >= b) x = x - b;
-  return x;
-}
-
-int div(int a, int b)
-{
-  int q = 0;
-  while (q * b <= a) q++;
-  return (q - 1);
-}
-/* Notes */
-/* The variable sector is the absolute sector */
-/* Reading in the sector ah = 2 */
-/* Variables */
-/* 19 */
-/* ax = 512 + sectorCount */
-/* bx = buffer */
-/* cx = trackNo * 256 + relSecNo */
-/* dx = headNo * 256 */
-
+/* ax = 2 */
 void readSector(char *buffer, int sector, int sectorCount)
 {
   int relSecNo = mod(sector, 18) + 1;
@@ -193,14 +121,7 @@ void readSector(char *buffer, int sector, int sectorCount)
   interrupt(19, 2 * 256 + sectorCount, buffer, trackNo * 256 + relSecNo, headNo * 256);
 }
 
-/* Notes */
-/* Writing in sector ah = 3 */
-/* Variables */
-/* 33 */
-/* ax = 768 + sectorCount */
-/* bx = buffer */
-/* cx = trackNo * 256 + relSecNo */
-/* dx = headNo * 256 */
+/* ax = 6 */
 void writeSector(char *buffer, int sector, int sectorCount)
 {
   int relSecNo = mod(sector, 18) + 1;
@@ -209,9 +130,13 @@ void writeSector(char *buffer, int sector, int sectorCount)
   interrupt(19, 3 * 256 + sectorCount, buffer, trackNo * 256 + relSecNo, headNo * 256);
 }
 
+/* ax = 12 */
 void clearScreen(bx, cx)
 {
-  /* TODO */
+  /* bx =  background color, cx = foreground color             */
+  /* These colors get set to the BH register in interrupt 16   */
+  /* Ex) BH = 1Eh ,background is blue and foreground is yellow */
+
   int i = 0;
   while(i != 24) {
     ++i;
@@ -219,23 +144,68 @@ void clearScreen(bx, cx)
     interrupt(16, 14 * 256 + '\r', 0, 0, 0);/* return to the beginning of the line */
   }
 
-  /*
-     AH = 6, indicating function 6;
-   AL = 0, meaning scroll whole screen or window;
-   BH = the attribute byte for blank lines, explained next;
-   CH and CL are the row and column for the upper left-hand corner of the window (0,0); and
-   DH and DL are the row and column for the lower right-hand corner, (24,79).
-  */
-
   interrupt(16, 512, 0, 0, 0); /* Reset cursor to upper left hand corner*/
   if(bx > 0 && bx < 8 && cx > 0 && cx < 16 ) {
     interrupt(16, 1536, 0x10 * 256 * (bx - 1) + 0x01 * 256 * (cx - 1), 0, 24 * 256 + 79);
   }
 }
 
+
+/* ax = 13 */
+void writeInt(int n, int cx)
+{
+  char numToPrint[6]; /* All are 5 digit numbers */
+  int i;
+  int x = n;
+  int end = 0;
+
+  if(n == 0) { /* Special case where n == 0 */
+    numToPrint[0] = 48; /* zero in asci */
+    numToPrint[1] = '\0';
+    interrupt(33, 0, numToPrint, cx, 0);
+    return;
+  }
+
+  while(x != 0) {
+    x = div(x, 10);
+    ++end;
+  }
+
+  numToPrint[end] = '\0';
+  for(i = end - 1; i >= 0; --i) {
+    numToPrint[i] = mod(n, 10) + 48;
+    n = div(n, 10);
+  }
+
+  interrupt(33, 0, numToPrint, cx, 0);
+  return;
+}
+
+/* ax = 14 */
+void readInt(int *n)
+{
+  char buffer[80];
+  int i;
+  for(i = 0; i < 80; ++i)buffer[i] = 0;
+  interrupt(33, 1, buffer, 0, 0); /* read in string, to be converted */
+
+  *n = 0;
+  i = 0;
+  while(buffer[i] != '\0') { /* while we are not at the end of the string */
+    /* if the char is not between 0-9 (inclusive) then it is garbage input && we should return immediately */
+    if(!((buffer[i] - 48) >= 0 && (buffer[i] - 48) <= 9)) {
+      *n = 0;
+      return;
+    }
+    *n *= 10; /* shifts all the numbers to the left one decimal place */
+    *n += buffer[i] - 48; /* put the move recent number in the ones place */
+    ++i; /* move to the next char to process */
+  }
+  return;
+}
+
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
-  /* return; */
   switch(ax) {
   case 0:
     printString(bx, cx);
@@ -261,4 +231,18 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
   default:
     interrupt(33, 0, "General BlackDOS error.\r\n\0", 0, 0);
   }
+}
+
+int mod(int a, int b)
+{
+  int x = a;
+  while (x >= b) x = x - b;
+  return x;
+}
+
+int div(int a, int b)
+{
+  int q = 0;
+  while (q * b <= a) q++;
+  return (q - 1);
 }
