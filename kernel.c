@@ -29,20 +29,18 @@ void printLogo();
 
 void main()
 {
-  /* Lab 3 */
-  char buffer[512];  
+  char buffer[512];
   int i;
   makeInterrupt21();
-  for (i = 0; i < 512; i++)
-    buffer[i] = 0;
+  for (i = 0; i < 512; i++) buffer[i] = 0;
   buffer[0] = 1;
-  buffer[1] = 14;
+  buffer[1] = 0xE;
   interrupt(33, 6, buffer, 258, 1);
   interrupt(33, 12, buffer[0] + 1, buffer[1] + 1, 0);
   printLogo();
   interrupt(33, 2, buffer, 30, 1);
   interrupt(33, 0, buffer, 0, 0);
-  while (1);
+  while (1) ;
 }
 
 
@@ -62,8 +60,7 @@ void readInt(int *n)
 {
   char buffer[80];
   int i;
-  for(i = 0; i < 80; ++i) 
-    buffer[i] = 0;
+  for(i = 0; i < 80; ++i)buffer[i] = 0;
   interrupt(33, 1, buffer, 0, 0); /* read in string, to be converted */
 
   *n = 0;
@@ -122,26 +119,26 @@ void readString(char *buffer)
     switch(*input) {
     case 0xD: /* if [ENTER] is pressed */
       buffer[i] = '\0'; /* add NULL Terminator to the end of the buffer */
-      interrupt(16, 14*256 + '\n', 0, 0, 0);/* print new line */
-      interrupt(16, 14*256 + '\r', 0, 0, 0);/* return to the beginning of the line */
+      interrupt(16, 14 * 256 + '\n', 0, 0, 0);/* print new line */
+      interrupt(16, 14 * 256 + '\r', 0, 0, 0);/* return to the beginning of the line */
       return;
     case 0x8:  /* if backspace was pressed and the buffer is not empty */
       if(i < 1)break;
-      interrupt(16, 14*256 + *input, 0, 0, 0); /* print backspace (move the cursor back) */
+      interrupt(16,  14 * 256 + *input, 0, 0, 0); /* print backspace (move the cursor back) */
       i--; /* go one char back in the buffer */
       buffer[i] = ' '; /* change it to a space, not technically needed */
-      interrupt(16, 14*256 + buffer[i], 0, 0, 0); /* print the space (this looks clean) */
-      interrupt(16, 14*256 + *input, 0, 0, 0); /* move the cursor back again */
+      interrupt(16,  14 * 256 + buffer[i], 0, 0, 0); /* print the space (this looks clean) */
+      interrupt(16, 14 * 256 + *input, 0, 0, 0); /* move the cursor back again */
       break;
     default:
-      interrupt(16, 14*256 + *input, 0, 0, 0); /* print the char to the console */
+      interrupt(16,  14 * 256 + *input, 0, 0, 0); /* print the char to the console */
       buffer[i] = *input; /* save the char in the buffer */
       i++; /* move to the next spot in the buffer */
     }
   }
 
-  interrupt(16, 14*256 + '\n', 0, 0, 0); /* print new line */
-  interrupt(16, 14*256 + '\r', 0, 0, 0); /* return to the beginning of the line */
+  interrupt(16, 14 * 256 + '\n', 0, 0, 0); /* print new line */
+  interrupt(16, 14 * 256 + '\r', 0, 0, 0); /* return to the beginning of the line */
   buffer[79] = '\0'; /* if you read 79 characters, set 80 to '\0' */
   return;
 }
@@ -151,7 +148,7 @@ void printString(char *c, int d)
   switch(d) {
   case 0: /* print to the console */
     while(*c != '\0') {
-      interrupt(16, 14*256 + *c, 0, 0, 0);
+      interrupt(16, 14 * 256 + *c, 0, 0, 0);
       c++;
     }
     break;
@@ -178,62 +175,61 @@ int div(int a, int b)
   while (q * b <= a) q++;
   return (q - 1);
 }
+/* Notes */
+/* The variable sector is the absolute sector */
+/* Reading in the sector ah = 2 */
+/* Variables */
+/* 19 */
+/* ax = 512 + sectorCount */
+/* bx = buffer */
+/* cx = trackNo * 256 + relSecNo */
+/* dx = headNo * 256 */
 
-void readSector(char* buffer, int sector, int sectorCount)
+void readSector(char *buffer, int sector, int sectorCount)
 {
-  /* Notes */
-  
-  /* The variable sector is the absolute sector */
-  /* Reading in the sector ah = 2 */
-  /* Variables */
-  /* 19 */
-  /* ax = 512 + sectorCount */
-  /* bx = buffer */
-  /* cx = trackNo * 256 + relSecNo */
-  /* dx = headNo * 256 */
-  
   int relSecNo = mod(sector, 18) + 1;
   int headNo = mod(div(sector, 18), 2);
   int trackNo = div(sector, 36);
-  interrupt(19, 2*256 + sectorCount, buffer, trackNo*256 + relSecNo, headNo*256);
+  interrupt(19, 2 * 256 + sectorCount, buffer, trackNo * 256 + relSecNo, headNo * 256);
 }
 
-void writeSector(char* buffer, int sector, int sectorCount)
+/* Notes */
+/* Writing in sector ah = 3 */
+/* Variables */
+/* 33 */
+/* ax = 768 + sectorCount */
+/* bx = buffer */
+/* cx = trackNo * 256 + relSecNo */
+/* dx = headNo * 256 */
+void writeSector(char *buffer, int sector, int sectorCount)
 {
-  /* Notes */
-  /* Writing in sector ah = 3 */
-  /* Variables */
-  /* 33 */
-  /* ax = 768 + sectorCount */
-  /* bx = buffer */
-  /* cx = trackNo * 256 + relSecNo */
-  /* dx = headNo * 256 */
-
   int relSecNo = mod(sector, 18) + 1;
   int headNo = mod(div(sector, 18), 2);
   int trackNo = div(sector, 36);
-  interrupt(19, 3*256 + sectorCount, buffer, trackNo*256 + relSecNo, headNo*256);
+  interrupt(19, 3 * 256 + sectorCount, buffer, trackNo * 256 + relSecNo, headNo * 256);
 }
 
 void clearScreen(bx, cx)
 {
+  /* TODO */
   int i = 0;
-
-  while( i < 24 ) {
-    interrupt(16, 14*256 + '\n', 0, 0, 0); /* print new line */
-    interrupt(16, 14*256 + '\r', 0, 0, 0); /* return to the beginning of the line */
-    i++;
+  while(i != 24) {
+    ++i;
+    interrupt(16, 14 * 256 + '\n', 0, 0, 0);/* print new line */
+    interrupt(16, 14 * 256 + '\r', 0, 0, 0);/* return to the beginning of the line */
   }
 
-  interrupt(16, 2*256, 0, 0, 0); /* places cursor in top left corner */
+  /*
+     AH = 6, indicating function 6;
+   AL = 0, meaning scroll whole screen or window;
+   BH = the attribute byte for blank lines, explained next;
+   CH and CL are the row and column for the upper left-hand corner of the window (0,0); and
+   DH and DL are the row and column for the lower right-hand corner, (24,79).
+  */
 
-  /* AH = 6, indicating function 6;
-     AL = 0, meaning scroll whole screen or window;
-     BH = the attribute byte for blank lines, explained next;
-     CH and CL are the row and column for the upper left-hand corner of the window (0,0); and
-     DH and DL are the row and column for the lower right-hand corner, (24,79). */
-  if (bx > 0 && bx < 8 && cx > 0 && cx < 16) {
-    interrupt(16, 6*256, 4096*(bx - 1) + 256*(cx - 1), 0, 6223); 
+  interrupt(16, 512, 0, 0, 0); /* Reset cursor to upper left hand corner*/
+  if(bx > 0 && bx < 8 && cx > 0 && cx < 16 ) {
+    interrupt(16, 1536, 0x10 * 256 * (bx - 1) + 0x01 * 256 * (cx - 1), 0, 24 * 256 + 79);
   }
 }
 
