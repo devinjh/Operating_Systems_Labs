@@ -43,7 +43,6 @@ void main()
   while (1);
 }
 
-
 void printLogo()
 {
   interrupt(33, 0, "       ___   `._   ____  _            _    _____   ____   _____ \r\n\0", 0, 0);
@@ -133,9 +132,9 @@ void writeSector(char *buffer, int sector, int sectorCount)
 /* ax = 12 */
 void clearScreen(bx, cx)
 {
-  /* bx =  background color, cx = foreground color             */
-  /* These colors get set to the BH register in interrupt 16   */
-  /* Ex) BH = 1Eh ,background is blue and foreground is yellow */
+  /* bx =  background color, cx = foreground color                       */
+  /* These colors get set to the BH register in interrupt 16             */
+  /* Ex) BH = 1Eh ,background is blue(0x01) and foreground is yellow(0x0E) */
 
   int i = 0;
   while(i != 24) {
@@ -150,23 +149,22 @@ void clearScreen(bx, cx)
   }
 }
 
-
 /* ax = 13 */
 void writeInt(int n, int cx)
 {
-  char numToPrint[6]; /* All are 5 digit numbers */
+  char numToPrint[6]; /* Maximum 5 digits plus NULL terminator*/
   int i;
   int x = n;
   int end = 0;
 
   if(n == 0) { /* Special case where n == 0 */
-    numToPrint[0] = 48; /* zero in asci */
+    numToPrint[0] = 48; /* zero in ascii */
     numToPrint[1] = '\0';
     interrupt(33, 0, numToPrint, cx, 0);
     return;
   }
 
-  while(x != 0) {
+  while(x != 0) {/* Finding the number of digits */
     x = div(x, 10);
     ++end;
   }
@@ -194,11 +192,11 @@ void readInt(int *n)
   while(buffer[i] != '\0') { /* while we are not at the end of the string */
     /* if the char is not between 0-9 (inclusive) then it is garbage input && we should return immediately */
     if(!((buffer[i] - 48) >= 0 && (buffer[i] - 48) <= 9)) {
-      *n = 0;
+      *n = 0; /* We set to zero to indicate failure */
       return;
     }
     *n *= 10; /* shifts all the numbers to the left one decimal place */
-    *n += buffer[i] - 48; /* put the move recent number in the ones place */
+    *n += buffer[i] - 48; /* puts the most recent number in the ones place */
     ++i; /* move to the next char to process */
   }
   return;
