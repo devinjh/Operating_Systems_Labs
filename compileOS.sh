@@ -6,4 +6,4 @@ dd if=kernel of=floppya.img bs=512 conv=notrunc seek=259
 dd if=config of=floppya.img bs=512 count=1 seek=258 conv=notrunc
 bcc -ansi -c -o Shell.o Shell.c
 ld86 -o Shell -d Shell.o basm.o
-dd if=Shell of=floppya.img bs=512 count=1 seek=30 conv=notrunc
+dd if=Shell of=floppya.img bs=512 count=10 seek=30 conv=notrunc
