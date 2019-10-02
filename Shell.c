@@ -8,6 +8,15 @@ void fillShellChoices(char **);
 void boot();
 void clrs();
 void echo(char *);
+void copy(char *);
+void ddir();
+void exec(char *);
+void help();
+void prnt(char *);
+void remv(char *);
+void senv();
+void show(char *);
+void twet(char *);
 
 void main()
 {
@@ -34,7 +43,7 @@ void fillShellChoices(char choices[][5])
   fillStr(&choices[0][0], 5, "boot\0");
   fillStr(&choices[1][0], 5, "clrs\0");
   fillStr(&choices[2][0], 5, "echo\0");
-  fillStr(&choices[3][0], 5, "ddir\0");
+  fillStr(&choices[3][0], 5, "copy\0");
   fillStr(&choices[4][0], 5, "ddir\0");
   fillStr(&choices[5][0], 5, "exec\0");
   fillStr(&choices[6][0], 5, "help\0");
@@ -66,22 +75,31 @@ void shellCommand(char choices[][5], char *input, int numChoices)
         echo(arg2);
         break;
       case 3:
+        copy(arg2);
         break;
       case 4:
+        ddir();
         break;
       case 5:
+        exec(arg2);
         break;
       case 6:
+        help();
         break;
       case 7:
+        prnt(arg2);
         break;
       case 8:
+        remv(arg2);
         break;
       case 9:
+        senv();
         break;
       case 10:
+        show(arg2);
         break;
       case 11:
+        twet(arg2);
         break;
       }
       break;
@@ -93,13 +111,154 @@ void boot()
 {
   interrupt(25, 0, 0, 0, 0);
 }
+
 void clrs()
 {
   interrupt(33, 12, 0, 0, 0);
 }
+
 void echo(char *arg2)
 {
   interrupt(33, 0, arg2, 0, 0);
+  interrupt(33, 0, "\r\n", 0, 0);
+}
+
+void copy(char *arg2)
+{
+  char file1[80], file2[80], extra[80];
+  file1[0] = '\0';
+  file2[0] = '\0';
+
+  splitArg(arg2, file1, extra);
+  splitArg(extra, file2, extra);
+
+  if(extra[0] != '\0') {
+    interrupt(33, 0, "Copy was called with too many arguments\r\n", 0, 0);
+    return;
+  }
+  if(file2[0] == '\0' || file1[0] == '\0') {
+    interrupt(33, 0, "Copy was called with too few arguments\r\n", 0, 0);
+    return;
+  }
+  interrupt(33, 0, "Copy was called with files: ", 0, 0);
+  interrupt(33, 0, file1, 0, 0);
+  interrupt(33, 0, " and ", 0, 0);
+  interrupt(33, 0, file2, 0, 0);
+  interrupt(33, 0, "\r\n", 0, 0);
+}
+
+void ddir()
+{
+  interrupt(33, 0, "Ddir was called\r\n", 0, 0);
+}
+
+void exec(char *arg2)
+{
+  char filename [80];
+  filename[0] = '\0';
+
+  splitArg(arg2, filename, arg2);
+  if(arg2[0] != '\0') {
+    interrupt(33, 0, "Exec was called with too many arguments\r\n", 0, 0);
+    return;
+  }
+  if(filename[0] == '\0') {
+    interrupt(33, 0, "Exec was called with too few arguments\r\n", 0, 0);
+    return;
+  }
+
+  interrupt(33, 0, "Exec was called with filename: ", 0, 0);
+  interrupt(33, 0, filename, 0, 0);
+  interrupt(33, 0, "\r\n", 0, 0);
+}
+
+void help()
+{
+  interrupt(33, 0, "Help was called\r\n", 0, 0);
+}
+
+void prnt(char *arg2)
+{
+  char filename [80];
+  filename[0] = '\0';
+
+  splitArg(arg2, filename, arg2);
+  if(arg2[0] != '\0') {
+    interrupt(33, 0, "Prnt was called with too many arguments\r\n", 0, 0);
+    return;
+  }
+  if(filename[0] == '\0') {
+    interrupt(33, 0, "Prnt was called with too few arguments\r\n", 0, 0);
+    return;
+  }
+
+  interrupt(33, 0, "Prnt was called with filename: ", 0, 0);
+  interrupt(33, 0, filename, 0, 0);
+  interrupt(33, 0, "\r\n", 0, 0);
+}
+
+void remv(char *arg2)
+{
+  char  filename [80];
+  filename[0] = '\0';
+
+  splitArg(arg2, filename, arg2);
+  if(arg2[0] != '\0') {
+    interrupt(33, 0, "Remv was called with too many arguments\r\n", 0, 0);
+    return;
+  }
+  if(filename[0] == '\0') {
+    interrupt(33, 0, "Remv was called with too few arguments\r\n", 0, 0);
+    return;
+  }
+
+  interrupt(33, 0, "Remv was called with filename: ", 0, 0);
+  interrupt(33, 0, filename, 0, 0);
+  interrupt(33, 0, "\r\n", 0, 0);
+}
+
+void senv()
+{
+  interrupt(33, 0, "Senv was called\r\n", 0, 0);
+}
+
+void show(char *arg2)
+{
+  char  filename [80];
+  filename[0] = '\0';
+
+  splitArg(arg2, filename, arg2);
+  if(arg2[0] != '\0') {
+    interrupt(33, 0, "Show was called with too many arguments\r\n", 0, 0);
+    return;
+  }
+  if(filename[0] == '\0') {
+    interrupt(33, 0, "Show was called with too few arguments\r\n", 0, 0);
+    return;
+  }
+
+  interrupt(33, 0, "Show was called with filename: ", 0, 0);
+  interrupt(33, 0, filename, 0, 0);
+  interrupt(33, 0, "\r\n", 0, 0);
+}
+
+void twet(char *arg2)
+{
+  char  filename [80];
+  filename[0] = '\0';
+
+  splitArg(arg2, filename, arg2);
+  if(arg2[0] != '\0') {
+    interrupt(33, 0, "Twet was called with too many arguments\r\n", 0, 0);
+    return;
+  }
+  if(filename[0] == '\0') {
+    interrupt(33, 0, "Twet was called with too few arguments\r\n", 0, 0);
+    return;
+  }
+
+  interrupt(33, 0, "Twet was called with filename: ", 0, 0);
+  interrupt(33, 0, filename, 0, 0);
   interrupt(33, 0, "\r\n", 0, 0);
 }
 
