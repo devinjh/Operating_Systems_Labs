@@ -30,7 +30,7 @@ void runProgram(int, int, int);
 
 void main()
 {
-  char buffer[512];
+  char buffer[13312];
   makeInterrupt21();
   interrupt(33, 2, buffer, 258, 1);
   interrupt(33, 12, buffer[0] + 1, buffer[1] + 1, 0);
@@ -54,14 +54,14 @@ void printLogo()
 
 void runProgram(int start, int size, int segment)
 {
-  char buffer[4096];
+  char buffer[13312];
   int i = 0;
-  for(i = 0; i < 4096; ++i)buffer[i] = 0;
+  for(i = 0; i < 13312; ++i)buffer[i] = 0;
 
   interrupt(33, 2, buffer, start, size); /* read from disk the program*/
   segment *= 0x1000;
 
-  for(i = 0; i < 4096; ++i) {
+  for(i = 0; i < 13312; ++i) {
     putInMemory(segment, i, buffer[i]);
   }
 
