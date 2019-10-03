@@ -52,32 +52,42 @@ void printLogo()
   interrupt(33, 0, " Author(s): Andrew Robinson, Tristan Hess, Devin Hopkins.\r\n\r\n\0", 0);
 }
 
+// Runs a program given the starting sector of the program as an integer, the number of sectors to read as an integer, and the segment where you want it to run as an integer
 void runProgram(int start, int size, int segment)
 {
+  // Make sure the buffer doesn't have a bunch of abstract values
   char buffer[13312];
   int i = 0;
   for(i = 0; i < 13312; ++i)buffer[i] = 0;
 
+  // Read the program in from the disk
   interrupt(33, 2, buffer, start, size); /* read from disk the program*/
+  
+  // Getting the base location of the segment
   segment *= 0x1000;
 
+  // PPut the program in memory from the char array
   for(i = 0; i < 13312; ++i) {
     putInMemory(segment, i, buffer[i]);
   }
 
+  // Launch the program
   launchProgram(segment);
 }
 
 /* ax = 0 */
 void printString(char *c, int d)
 {
+  // Seeing where the string is supposed to go
   switch(d) {
+  // Prints to the console
   case 0: /* print to the console */
     while(*c != '\0') {
       interrupt(16, 14 * 256 + *c, 0, 0, 0);
       c++;
     }
     break;
+  // Prints to the printer
   case 1: /* print to the printer */
     while(*c != '\0') {
       interrupt(23, *c, 0, 0, 0);
@@ -127,9 +137,12 @@ void readString(char *buffer)
 /* ax = 2 */
 void readSector(char *buffer, int sector, int sectorCount)
 {
+  // Modifying the sector number to get the relative sector number, head number, and the track number
   int relSecNo = mod(sector, 18) + 1;
   int headNo = mod(div(sector, 18), 2);
   int trackNo = div(sector, 36);
+
+  // Reading in the sector
   interrupt(19, 2 * 256 + sectorCount, buffer, trackNo * 256 + relSecNo, headNo * 256);
 }
 
@@ -142,9 +155,12 @@ void stop()
 /* ax = 6 */
 void writeSector(char *buffer, int sector, int sectorCount)
 {
+  // Modiying the sector number to get the relative sector number, head number, and the track number
   int relSecNo = mod(sector, 18) + 1;
   int headNo = mod(div(sector, 18), 2);
   int trackNo = div(sector, 36);
+
+  // Writing to the sector
   interrupt(19, 3 * 256 + sectorCount, buffer, trackNo * 256 + relSecNo, headNo * 256);
 }
 
