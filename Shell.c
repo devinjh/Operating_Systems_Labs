@@ -102,9 +102,10 @@ void shellCommand(char choices[][5], char *input, int numChoices)
         twet(arg2);
         break;
       }
-      break;
+      return;
     }
   }
+  interrupt(33,0,"bad command or file name\r\n",0,0);
 }
 
 void boot()
