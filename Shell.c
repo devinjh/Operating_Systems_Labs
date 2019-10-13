@@ -1,3 +1,4 @@
+/* Function prototypes*/
 void shellCommand(char *);
 int strCmp(char *, char *);
 int commandArguments(char *, char *, char *, char *);
@@ -22,7 +23,7 @@ void main()
 {
   int numChoices = 12;
   char buffer[512];
-  char choices[12][5];
+  char choices[12][5]; /* Commands are always 4 characters max and one character for the null terminator*/
 
   fillShellChoices(choices);
 
@@ -30,10 +31,11 @@ void main()
   interrupt(33, 12, buffer[0] + 1, buffer[1] + 1, 0); /* clear screen and set colors to config colors */
 
   interrupt(33, 0, "Welcome to Andrew, Devin, and Tristans Shell! Enjoy your stay\r\n", 0, 0);
+
   while(1) {
-    interrupt(33, 0, "^(~(oo)~)^\r\n", 0, 0);
-    interrupt(33, 1, buffer, 0, 0);
-    shellCommand(choices, buffer, numChoices);
+    interrupt(33, 0, "^(~(oo)~)^\r\n", 0, 0); /* Obligatory year of the pig thing*/
+    interrupt(33, 1, buffer, 0, 0); /* let the user input a command*/
+    shellCommand(choices, buffer, numChoices); /* process the command*/
   }
   return;
 }
@@ -47,6 +49,7 @@ void fillShellChoices(char choices[][5])
   fillStr(&choices[4][0], 5, "ddir\0");
   fillStr(&choices[5][0], 5, "exec\0");
   fillStr(&choices[6][0], 5, "help\0");
+
   fillStr(&choices[7][0], 5, "prnt\0");
   fillStr(&choices[8][0], 5, "remv\0");
   fillStr(&choices[9][0], 5, "senv\0");
@@ -58,13 +61,13 @@ void shellCommand(char choices[][5], char *input, int numChoices)
 {
   char arg1[80], arg2[80];
   int i = 0;
-  if(!splitArg(input, arg1, arg2)) {
+  if(!splitArg(input, arg1, arg2)) { /* get the command from the user input, and put the rest in arg2*/
     return;
   }
 
   for(i = 0; i < numChoices; ++i) {
-    if(strCmp(arg1, &choices[i][0])) {
-      switch(i) {
+    if(strCmp(arg1, &choices[i][0])) { /* check if what the user enters matches a command*/
+      switch(i) {/* If a match is found, go to the corresponding command function*/
       case 0:
         boot();
         break;
@@ -102,10 +105,10 @@ void shellCommand(char choices[][5], char *input, int numChoices)
         twet(arg2);
         break;
       }
-      return;
+      return;/* After you find a match, and run the function, you dont need to check anymore*/
     }
   }
-  interrupt(33,0,"bad command or file name\r\n",0,0);
+  interrupt(33,0,"bad command or file name\r\n",0,0); /* No command was matched*/
 }
 
 void boot()
@@ -130,10 +133,10 @@ void copy(char *arg2)
   file1[0] = '\0';
   file2[0] = '\0';
 
-  splitArg(arg2, file1, extra);
-  splitArg(extra, file2, extra);
+  splitArg(arg2, file1, extra); /* fill file1 with the characters up to the next whitespace*/
+  splitArg(extra, file2, extra); /* fill file2 with the characters up to the next whitespace*/
 
-  if(extra[0] != '\0') {
+  if(extra[0] != '\0') { /* if the user entered more than two files, there are too many arguments*/
     interrupt(33, 0, "Copy was called with too many arguments\r\n", 0, 0);
     return;
   }
