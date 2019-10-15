@@ -31,10 +31,15 @@ void error(int);
 
 void main()
 {
+  char buffer[512];
   makeInterrupt21();
+
+  interrupt(33, 2, buffer, 258, 1); /* load config file */
+  interrupt(33, 12, buffer[0] + 1, buffer[1] + 1, 0); /* clear screen and set colors to config colors */
   printLogo();
-  runProgram(30, 8, 2); /* run program at sector 30 */
-  interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
+
+  interrupt(33, 3, "msg\0", buffer, &size); /* load and print msg file */
+  interrupt(33, 0, buffer, 0, 0);
   while(1);
 }
 

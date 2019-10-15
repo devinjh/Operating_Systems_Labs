@@ -22,13 +22,9 @@ void twet(char *);
 void main()
 {
   int numChoices = 12;
-  char buffer[512];
   char choices[12][5]; /* Commands are always 4 characters max and one character for the null terminator*/
 
   fillShellChoices(choices);
-
-  interrupt(33, 2, buffer, 258, 1); /* load config file */
-  interrupt(33, 12, buffer[0] + 1, buffer[1] + 1, 0); /* clear screen and set colors to config colors */
 
   interrupt(33, 0, "Welcome to Andrew, Devin, and Tristans Shell! Enjoy your stay\r\n", 0, 0);
 
