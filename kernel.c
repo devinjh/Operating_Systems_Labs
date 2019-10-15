@@ -231,6 +231,12 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
   case 2:
     readSector(bx, cx, dx);
     break;
+  case 3:
+    readFile(bx, cx, dx);
+    break;
+  case 4:
+    runProgram(bx, cx);
+    break;
   case 5:
     stop();
     break;
