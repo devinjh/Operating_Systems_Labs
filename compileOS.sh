@@ -4,6 +4,8 @@ dd if=/dev/zero of=floppya.img bs=512 count=2880
 dd if=bootload of=floppya.img bs=512 count=1 conv=notrunc
 # put map into floppy at sector 256
 dd if=map of=floppya.img bs=512 count=1 seek=256 conv=notrunc
+# compile loadFile
+gcc -o loadFile loadFile.c
 # compile kernel
 bcc -ansi -c -o kernel.o kernel.c
 # link kernel
