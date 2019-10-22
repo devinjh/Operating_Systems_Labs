@@ -28,14 +28,29 @@ void handleInterrupt21(int, int, int, int);
 void printLogo();
 void runProgram(int, int, int);
 void error(int);
+void readFile(char* fname, char* buffer, int* size);
 
 void main()
 {
-  makeInterrupt21();
+  /*makeInterrupt21();
   printLogo();
-  runProgram(30, 8, 2); /* run program at sector 30 */
-  interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
-  while(1);
+  runProgram(30, 8, 2);*/ /* run program at sector 30 */
+  /*interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
+  while(1);*/
+
+  char buffer[512];
+  int size;
+  makeInterrupt21();
+  
+  /* Step 0 – config file */
+  interrupt(33,2,buffer,258,1);
+  interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
+  printLogo();
+  
+  /* Step 1 – load and print msg file (Lab 3) */
+  interrupt(33,3,”msg\0”,buffer,&size);
+  interrupt(33,0,buffer,0,0);
+  while (1);
 }
 
 void printLogo()
@@ -48,6 +63,11 @@ void printLogo()
   interrupt(33, 0, "._/'     `\\.      |____/|_|\\__,_|\\___|_|\\_\\_____/ \\____/|_____/\r\n\0", 0, 0);
   interrupt(33, 0, " BlackDOS2020 v. 1.03, c. 2019. Based on a project by M. Black. \r\n\0", 0, 0);
   interrupt(33, 0, " Author(s): Andrew Robinson, Tristan Hess, Devin Hopkins.\r\n\r\n\0", 0);
+}
+
+void readFile(char* fname, char* buffer, int* size)
+{
+  /* to do */
 }
 
 void runProgram(int start, int size, int segment)
@@ -230,6 +250,9 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     break;
   case 2:
     readSector(bx, cx, dx);
+    break;
+  case 3:
+    readFile(bx, cx, dx);
     break;
   case 5:
     stop();
