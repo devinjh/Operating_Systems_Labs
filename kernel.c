@@ -32,25 +32,31 @@ void readFile(char* fname, char* buffer, int* size);
 
 void main()
 {
-  /*makeInterrupt21();
+  /* THIS IS FROM LAB 5 */
+  makeInterrupt21();
   printLogo();
-  runProgram(30, 8, 2);*/ /* run program at sector 30 */
-  /*interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
-  while(1);*/
+  runProgram(30, 8, 2); /* run program at sector 30 */
+  interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
+  while(1);
 
+  /* THIS IS FOR LAB 6 */
+  /*
   char buffer[512];
   int size;
   makeInterrupt21();
-  
+  */
+
   /* Step 0 – config file */
-  interrupt(33,2,buffer,258,1);
+  /*interrupt(33,2,buffer,258,1);
   interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
   printLogo();
-  
+  */
+
   /* Step 1 – load and print msg file (Lab 3) */
-  interrupt(33,3,”msg\0”,buffer,&size);
+  /*interrupt(33,3,”msg\0”,buffer,&size);
   interrupt(33,0,buffer,0,0);
   while (1);
+  */
 }
 
 void printLogo()
@@ -65,9 +71,10 @@ void printLogo()
   interrupt(33, 0, " Author(s): Andrew Robinson, Tristan Hess, Devin Hopkins.\r\n\r\n\0", 0);
 }
 
+/* ax = 3 */
 void readFile(char* fname, char* buffer, int* size)
 {
-  /* to do */
+  interrupt(33, 2, fname, buffer, size);
 }
 
 void runProgram(int start, int size, int segment)
