@@ -143,11 +143,25 @@ void readSector(char *buffer, int sector, int sectorCount)
 /* ax = 3 */
 void readFile(char* fname, char* buffer, int* size)
 {
-  interrupt(33, 0, "In readFile()!! Part 1\r\n\r\n\0", 0); /* This is for a test. */
-  interrupt(33, 2, buffer, 257, 1);
-  interrupt(33, 0, "In readFile()!! Part 2\r\n\r\n\0", 0); /* This is for a test. */
-  /*interrupt(33, 0, buffer + "TEST\r\n\r\n\0", 0);*/
-  interrupt(33, 0, "In readFile()!! Part 3\r\n\r\n\0", 0); /* This is for a test. */
+  char* directory[512];
+  int i = 0;
+  interrupt(33, 2, directory, 257, 1);
+
+  /* compare string - stolen from Shell.c*/
+  while(1) {
+    if(fname[i] != directory[i]) { /* if any character in the string doesn't match, they aren't equal*/
+      return interrupt(33, 15, 0, 0, 0);
+    }
+    if(fname[i] == '\0' && directory[i] == '\0') { /* if you reach the end of the strings at the same time, they are the same*/
+      return interrupt(33, 0, "they are the same\r\n\0", 0, 0);
+    }
+    if(fname[i] == '\0' || directory[i] == '\0') { /* if one string ends before the other they are not the same string*/
+      return interrupt(33, 15, 0, 0, 0);
+    }
+    ++i;
+  }
+
+
 }
 
 /* ax = 5 */
