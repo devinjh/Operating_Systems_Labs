@@ -33,30 +33,29 @@ void readFile(char* fname, char* buffer, int* size);
 void main()
 {
   /* THIS IS FROM LAB 5 */
-  makeInterrupt21();
+  /*makeInterrupt21();
   printLogo();
-  runProgram(30, 8, 2); /* run program at sector 30 */
-  interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
-  while(1);
+  runProgram(30, 8, 2);*/ /* run program at sector 30 */
+  /*interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
+  while(1);*/
 
   /* THIS IS FOR LAB 6 */
-  /*
   char buffer[512];
-  int size;
+  int size = 0;
+  int i = 0;
   makeInterrupt21();
-  */
+
+  for (i = 0; i < 512; ++i) { buffer[i] = 0; }
 
   /* Step 0 – config file */
-  /*interrupt(33,2,buffer,258,1);
+  interrupt(33,2,buffer,258,1);
   interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
   printLogo();
-  */
 
   /* Step 1 – load and print msg file (Lab 3) */
-  /*interrupt(33,3,”msg\0”,buffer,&size);
+  interrupt(33,3,"msg\0",buffer,&size);
   interrupt(33,0,buffer,0,0);
   while (1);
-  */
 }
 
 void printLogo()
@@ -156,6 +155,7 @@ void readSector(char *buffer, int sector, int sectorCount)
 void readFile(char* fname, char* buffer, int* size)
 {
   /*interrupt(33, 2, fname, buffer, size);*/
+  interrupt(33, 0, "In readFile()!!\r\n\r\n\0", 0);
 }
 
 /* ax = 5 */
@@ -258,9 +258,9 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
   case 2:
     readSector(bx, cx, dx);
     break;
-  /*case 3:
+  case 3:
     readFile(bx, cx, dx);
-    break;*/
+    break;
   case 5:
     stop();
     break;
