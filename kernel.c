@@ -32,20 +32,9 @@ void readFile(char* fname, char* buffer, int* size);
 
 void main()
 {
-  /* THIS IS FROM LAB 5 */
-  /*makeInterrupt21();
-  printLogo();
-  runProgram(30, 8, 2);*/ /* run program at sector 30 */
-  /*interrupt(33, 0, "Bad or missing command interpreter.\r\n\0", 0, 0);
-  while(1);*/
-
-  /* THIS IS FOR LAB 6 */
   char buffer[512];
-  int size = 0;
-  int i = 0;
+  int size;
   makeInterrupt21();
-
-  for (i = 0; i < 512; ++i) { buffer[i] = 0; }
 
   /* Step 0 – config file */
   interrupt(33,2,buffer,258,1);
@@ -89,7 +78,7 @@ void runProgram(int start, int size, int segment)
 /* ax = 0 */
 void printString(char *c, int d)
 {
-  switch(d) {
+  switch(d) {=
   case 0: /* print to the console */
     while(*c != '\0') {
       interrupt(16, 14 * 256 + *c, 0, 0, 0);
@@ -154,8 +143,11 @@ void readSector(char *buffer, int sector, int sectorCount)
 /* ax = 3 */
 void readFile(char* fname, char* buffer, int* size)
 {
-  /*interrupt(33, 2, fname, buffer, size);*/
-  interrupt(33, 0, "In readFile()!!\r\n\r\n\0", 0);
+  interrupt(33, 0, "In readFile()!! Part 1\r\n\r\n\0", 0); /* This is for a test. */
+  interrupt(33, 2, buffer, 257, 1);
+  interrupt(33, 0, "In readFile()!! Part 2\r\n\r\n\0", 0); /* This is for a test. */
+  /*interrupt(33, 0, buffer + "TEST\r\n\r\n\0", 0);*/
+  interrupt(33, 0, "In readFile()!! Part 3\r\n\r\n\0", 0); /* This is for a test. */
 }
 
 /* ax = 5 */
