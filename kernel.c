@@ -71,12 +71,6 @@ void printLogo()
   interrupt(33, 0, " Author(s): Andrew Robinson, Tristan Hess, Devin Hopkins.\r\n\r\n\0", 0);
 }
 
-/* ax = 3 */
-void readFile(char* fname, char* buffer, int* size)
-{
-  interrupt(33, 2, fname, buffer, size);
-}
-
 void runProgram(int start, int size, int segment)
 {
   char buffer[4096];
@@ -156,6 +150,12 @@ void readSector(char *buffer, int sector, int sectorCount)
   int headNo = mod(div(sector, 18), 2);
   int trackNo = div(sector, 36);
   interrupt(19, 2 * 256 + sectorCount, buffer, trackNo * 256 + relSecNo, headNo * 256);
+}
+
+/* ax = 3 */
+void readFile(char* fname, char* buffer, int* size)
+{
+  /*interrupt(33, 2, fname, buffer, size);*/
 }
 
 /* ax = 5 */
@@ -258,9 +258,9 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
   case 2:
     readSector(bx, cx, dx);
     break;
-  case 3:
+  /*case 3:
     readFile(bx, cx, dx);
-    break;
+    break;*/
   case 5:
     stop();
     break;
