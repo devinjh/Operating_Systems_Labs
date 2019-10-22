@@ -37,13 +37,13 @@ void main()
   makeInterrupt21();
 
   /* Step 0 – config file */
-  interrupt(33,2,buffer,258,1);
-  interrupt(33,12,buffer[0]+1,buffer[1]+1,0);
+  interrupt(33, 2, buffer, 258, 1);
+  interrupt(33, 12, buffer[0]+1, buffer[1]+1, 0);
   printLogo();
 
   /* Step 1 – load and print msg file (Lab 3) */
-  interrupt(33,3,"msg\0",buffer,&size);
-  interrupt(33,0,buffer,0,0);
+  interrupt(33, 3, "msg\0", buffer, &size);
+  interrupt(33, 0, buffer, 0, 0);
   while (1);
 }
 
@@ -78,7 +78,7 @@ void runProgram(int start, int size, int segment)
 /* ax = 0 */
 void printString(char *c, int d)
 {
-  switch(d) {=
+  switch(d) {
   case 0: /* print to the console */
     while(*c != '\0') {
       interrupt(16, 14 * 256 + *c, 0, 0, 0);
@@ -238,6 +238,44 @@ void readInt(int *n)
   return;
 }
 
+/* ax = 15 */
+void error(int bx)
+{
+   switch (bx) {
+           case 0:
+           /* error 0 = "File not found." */
+           interrupt(16, 3654, 0, 0, 0); interrupt(16, 3689, 0, 0, 0); interrupt(16, 3692, 0, 0, 0);
+           interrupt(16, 3685, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3694, 0, 0, 0);
+           interrupt(16, 3695, 0, 0, 0); interrupt(16, 3700, 0, 0, 0); interrupt(16, 3616, 0, 0, 0);
+           interrupt(16, 3686, 0, 0, 0); interrupt(16, 3695, 0, 0, 0); interrupt(16, 3701, 0, 0, 0);
+           interrupt(16, 3694, 0, 0, 0); interrupt(16, 3684, 0, 0, 0);
+           break;
+           case 1:
+           /* error 1 = "Bad file name." */
+           interrupt(16, 3650, 0, 0, 0); interrupt(16, 3681, 0, 0, 0); interrupt(16, 3684, 0, 0, 0);
+           interrupt(16, 3616, 0, 0, 0); interrupt(16, 3686, 0, 0, 0); interrupt(16, 3689, 0, 0, 0);
+           interrupt(16, 3692, 0, 0, 0); interrupt(16, 3685, 0, 0, 0); interrupt(16, 3616, 0, 0, 0);
+           interrupt(16, 3694, 0, 0, 0); interrupt(16, 3681, 0, 0, 0); interrupt(16, 3693, 0, 0, 0);
+           interrupt(16, 3685, 0, 0, 0);
+           break;
+           case 2:
+           /* error 2 = "Disk full." */
+           interrupt(16, 3652, 0, 0, 0); interrupt(16, 3689, 0, 0, 0); interrupt(16, 3699, 0, 0, 0);
+           interrupt(16, 3691, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3686, 0, 0, 0);
+           interrupt(16, 3701, 0, 0, 0); interrupt(16, 3692, 0, 0, 0); interrupt(16, 3692, 0, 0, 0);
+           break;
+           default:
+           /* default = "General error." */
+           interrupt(16, 3655, 0, 0, 0); interrupt(16, 3685, 0, 0, 0); interrupt(16, 3694, 0, 0, 0);
+           interrupt(16, 3685, 0, 0, 0); interrupt(16, 3698, 0, 0, 0); interrupt(16, 3681, 0, 0, 0);
+           interrupt(16, 3692, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3685, 0, 0, 0);
+           interrupt(16, 3698, 0, 0, 0); interrupt(16, 3698, 0, 0, 0); interrupt(16, 3695, 0, 0, 0);
+           interrupt(16, 3698, 0, 0, 0);
+   }
+   interrupt(16, 3630, 0, 0, 0); interrupt(16, 3597, 0, 0, 0); interrupt(16, 3594, 0, 0, 0);
+   interrupt(33, 5, 0, 0, 0);
+}
+
 void handleInterrupt21(int ax, int bx, int cx, int dx)
 {
   switch(ax) {
@@ -268,8 +306,11 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
   case 14:
     readInt(bx);
     break;
+  case 15:
+    error(bx);
+    break;
   default:
-    interrupt(33, 0, "General BlackDOS error.\r\n\0", 0, 0);
+    error(3);
   }
 }
 
@@ -287,39 +328,3 @@ int div(int a, int b)
   return (q - 1);
 }
 
-void error(int bx)
-{
-   switch (bx) {
-	   case 0:
-	   /* error 0 = "File not found." */
-	   interrupt(16, 3654, 0, 0, 0); interrupt(16, 3689, 0, 0, 0); interrupt(16, 3692, 0, 0, 0);
-	   interrupt(16, 3685, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3694, 0, 0, 0);
-	   interrupt(16, 3695, 0, 0, 0); interrupt(16, 3700, 0, 0, 0); interrupt(16, 3616, 0, 0, 0);
-	   interrupt(16, 3686, 0, 0, 0); interrupt(16, 3695, 0, 0, 0); interrupt(16, 3701, 0, 0, 0);
-	   interrupt(16, 3694, 0, 0, 0); interrupt(16, 3684, 0, 0, 0);
-	   break;
-	   case 1:
-	   /* error 1 = "Bad file name." */
-	   interrupt(16, 3650, 0, 0, 0); interrupt(16, 3681, 0, 0, 0); interrupt(16, 3684, 0, 0, 0);
-	   interrupt(16, 3616, 0, 0, 0); interrupt(16, 3686, 0, 0, 0); interrupt(16, 3689, 0, 0, 0);
-	   interrupt(16, 3692, 0, 0, 0); interrupt(16, 3685, 0, 0, 0); interrupt(16, 3616, 0, 0, 0);
-	   interrupt(16, 3694, 0, 0, 0); interrupt(16, 3681, 0, 0, 0); interrupt(16, 3693, 0, 0, 0);
-	   interrupt(16, 3685, 0, 0, 0);
-	   break;
-	   case 2:
-	   /* error 2 = "Disk full." */
-	   interrupt(16, 3652, 0, 0, 0); interrupt(16, 3689, 0, 0, 0); interrupt(16, 3699, 0, 0, 0);
-	   interrupt(16, 3691, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3686, 0, 0, 0);
-	   interrupt(16, 3701, 0, 0, 0); interrupt(16, 3692, 0, 0, 0); interrupt(16, 3692, 0, 0, 0);
-	   break;
-	   default:
-	   /* default = "General error." */
-	   interrupt(16, 3655, 0, 0, 0); interrupt(16, 3685, 0, 0, 0); interrupt(16, 3694, 0, 0, 0);
-	   interrupt(16, 3685, 0, 0, 0); interrupt(16, 3698, 0, 0, 0); interrupt(16, 3681, 0, 0, 0);
-	   interrupt(16, 3692, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3685, 0, 0, 0);
-	   interrupt(16, 3698, 0, 0, 0); interrupt(16, 3698, 0, 0, 0); interrupt(16, 3695, 0, 0, 0);
-	   interrupt(16, 3698, 0, 0, 0);
-   }
-   interrupt(16, 3630, 0, 0, 0); interrupt(16, 3597, 0, 0, 0); interrupt(16, 3594, 0, 0, 0);
-   interrupt(33, 5, 0, 0, 0);
-}
