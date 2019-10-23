@@ -15,12 +15,12 @@ dd if=kernel of=floppya.img bs=512 conv=notrunc seek=259
 # put config file into floppy at sector 258, config has background and foreground colors
 dd if=config of=floppya.img bs=512 count=1 seek=258 conv=notrunc
 # compile the shell
-bcc -ansi -c -o Shell.o Shell.c
+bcc -ansi -c -o shell.o shel.c
 # link the shell
-ld86 -o Shell -d Shell.o basm.o
+ld86 -o Shell -d shell.o basm.o
 # put shell on the disk and store the program name in dir
 ./loadFile Shell
 # put ddir on the disk and in the dir (for shell command ddir)
-./loadFile ddir
+./loadFile Ddir
 # put Stenv on the disk and in the dir (for shell command senv)
 ./loadFile Stenv
