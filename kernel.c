@@ -28,7 +28,7 @@ void handleInterrupt21(int, int, int, int);
 void printLogo();
 void runProgram(int, int, int);
 void error(int);
-void readFile(char* fname, char* buffer, int* size);
+void readFile(char *fname, char *buffer, int *size);
 
 void main()
 {
@@ -38,7 +38,7 @@ void main()
 
   /* Step 0 – config file */
   interrupt(33, 2, buffer, 258, 1);
-  interrupt(33, 12, buffer[0]+1, buffer[1]+1, 0);
+  interrupt(33, 12, buffer[0] + 1, buffer[1] + 1, 0);
   printLogo();
 
   /* Step 1 – load and print msg file (Lab 3) */
@@ -56,7 +56,7 @@ void printLogo()
   interrupt(33, 0, "   //   \\\\        | |_) | | (_| | (__|   <| |__| | |__| |____) |\r\n\0", 0, 0);
   interrupt(33, 0, "._/'     `\\.      |____/|_|\\__,_|\\___|_|\\_\\_____/ \\____/|_____/\r\n\0", 0, 0);
   interrupt(33, 0, " BlackDOS2020 v. 1.03, c. 2019. Based on a project by M. Black. \r\n\0", 0, 0);
-  interrupt(33, 0, " Author(s): Andrew Robinson, Tristan Hess, Devin Hopkins.\r\n\r\n\0", 0);
+  interrupt(33, 0, " Author(s): Andrew Robinson, Tristan Hess, Devin Hopkins.\r\n\r\n\0", 0, 0);
 }
 
 void runProgram(int start, int size, int segment)
@@ -82,6 +82,9 @@ void printString(char *c, int d)
   case 0: /* print to the console */
     while(*c != '\0') {
       interrupt(16, 14 * 256 + *c, 0, 0, 0);
+      if(*c == '\n') {
+        interrupt(16, 14 * 256 + '\r', 0, 0, 0);
+      }
       c++;
     }
     break;
@@ -141,33 +144,30 @@ void readSector(char *buffer, int sector, int sectorCount)
 }
 
 /* ax = 3 */
-void readFile(char* fname, char* buffer, int* size)
+void readFile(char *fname, char *buffer, int *size)
 {
-  char* directory[512];
-  int i = 0;
+  char directory[512];
+  int i = 0, file_num = 0;
   interrupt(33, 2, directory, 257, 1);
 
-  /* compare string - stolen from Shell.c*/
-  while(1) {
-    if(fname[i] != directory[i]) { /* if any character in the string doesn't match, they aren't equal*/
-      return interrupt(33, 15, 0, 0, 0);
+  for(file_num = 0; file_num < 32; ++file_num) {
+    for(i = 0; i < 8; ++i) {
+      if(fname[i] == '\0' && directory[i] == '\0') {
+        interrupt(33, 2, buffer, directory[16 * file_num + 8], directory[16 * file_num + 9]);
+        return;
+      }
+      if(fname[i] != directory[i + 16 * file_num]) {
+        break;
+      }
     }
-    if(fname[i] == '\0' && directory[i] == '\0') { /* if you reach the end of the strings at the same time, they are the same*/
-      return interrupt(33, 0, "they are the same\r\n\0", 0, 0);
-    }
-    if(fname[i] == '\0' || directory[i] == '\0') { /* if one string ends before the other they are not the same string*/
-      return interrupt(33, 15, 0, 0, 0);
-    }
-    ++i;
   }
-
-
+  interrupt(33, 0, "File not found\r\n\0", 0, 0);
 }
 
 /* ax = 5 */
 void stop()
 {
-  while(1){};
+  while(1) {};
 }
 
 /* ax = 6 */
@@ -255,39 +255,72 @@ void readInt(int *n)
 /* ax = 15 */
 void error(int bx)
 {
-   switch (bx) {
-           case 0:
-           /* error 0 = "File not found." */
-           interrupt(16, 3654, 0, 0, 0); interrupt(16, 3689, 0, 0, 0); interrupt(16, 3692, 0, 0, 0);
-           interrupt(16, 3685, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3694, 0, 0, 0);
-           interrupt(16, 3695, 0, 0, 0); interrupt(16, 3700, 0, 0, 0); interrupt(16, 3616, 0, 0, 0);
-           interrupt(16, 3686, 0, 0, 0); interrupt(16, 3695, 0, 0, 0); interrupt(16, 3701, 0, 0, 0);
-           interrupt(16, 3694, 0, 0, 0); interrupt(16, 3684, 0, 0, 0);
-           break;
-           case 1:
-           /* error 1 = "Bad file name." */
-           interrupt(16, 3650, 0, 0, 0); interrupt(16, 3681, 0, 0, 0); interrupt(16, 3684, 0, 0, 0);
-           interrupt(16, 3616, 0, 0, 0); interrupt(16, 3686, 0, 0, 0); interrupt(16, 3689, 0, 0, 0);
-           interrupt(16, 3692, 0, 0, 0); interrupt(16, 3685, 0, 0, 0); interrupt(16, 3616, 0, 0, 0);
-           interrupt(16, 3694, 0, 0, 0); interrupt(16, 3681, 0, 0, 0); interrupt(16, 3693, 0, 0, 0);
-           interrupt(16, 3685, 0, 0, 0);
-           break;
-           case 2:
-           /* error 2 = "Disk full." */
-           interrupt(16, 3652, 0, 0, 0); interrupt(16, 3689, 0, 0, 0); interrupt(16, 3699, 0, 0, 0);
-           interrupt(16, 3691, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3686, 0, 0, 0);
-           interrupt(16, 3701, 0, 0, 0); interrupt(16, 3692, 0, 0, 0); interrupt(16, 3692, 0, 0, 0);
-           break;
-           default:
-           /* default = "General error." */
-           interrupt(16, 3655, 0, 0, 0); interrupt(16, 3685, 0, 0, 0); interrupt(16, 3694, 0, 0, 0);
-           interrupt(16, 3685, 0, 0, 0); interrupt(16, 3698, 0, 0, 0); interrupt(16, 3681, 0, 0, 0);
-           interrupt(16, 3692, 0, 0, 0); interrupt(16, 3616, 0, 0, 0); interrupt(16, 3685, 0, 0, 0);
-           interrupt(16, 3698, 0, 0, 0); interrupt(16, 3698, 0, 0, 0); interrupt(16, 3695, 0, 0, 0);
-           interrupt(16, 3698, 0, 0, 0);
-   }
-   interrupt(16, 3630, 0, 0, 0); interrupt(16, 3597, 0, 0, 0); interrupt(16, 3594, 0, 0, 0);
-   interrupt(33, 5, 0, 0, 0);
+  switch (bx) {
+  case 0:
+    /* error 0 = "File not found." */
+    interrupt(16, 3654, 0, 0, 0);
+    interrupt(16, 3689, 0, 0, 0);
+    interrupt(16, 3692, 0, 0, 0);
+    interrupt(16, 3685, 0, 0, 0);
+    interrupt(16, 3616, 0, 0, 0);
+    interrupt(16, 3694, 0, 0, 0);
+    interrupt(16, 3695, 0, 0, 0);
+    interrupt(16, 3700, 0, 0, 0);
+    interrupt(16, 3616, 0, 0, 0);
+    interrupt(16, 3686, 0, 0, 0);
+    interrupt(16, 3695, 0, 0, 0);
+    interrupt(16, 3701, 0, 0, 0);
+    interrupt(16, 3694, 0, 0, 0);
+    interrupt(16, 3684, 0, 0, 0);
+    break;
+  case 1:
+    /* error 1 = "Bad file name." */
+    interrupt(16, 3650, 0, 0, 0);
+    interrupt(16, 3681, 0, 0, 0);
+    interrupt(16, 3684, 0, 0, 0);
+    interrupt(16, 3616, 0, 0, 0);
+    interrupt(16, 3686, 0, 0, 0);
+    interrupt(16, 3689, 0, 0, 0);
+    interrupt(16, 3692, 0, 0, 0);
+    interrupt(16, 3685, 0, 0, 0);
+    interrupt(16, 3616, 0, 0, 0);
+    interrupt(16, 3694, 0, 0, 0);
+    interrupt(16, 3681, 0, 0, 0);
+    interrupt(16, 3693, 0, 0, 0);
+    interrupt(16, 3685, 0, 0, 0);
+    break;
+  case 2:
+    /* error 2 = "Disk full." */
+    interrupt(16, 3652, 0, 0, 0);
+    interrupt(16, 3689, 0, 0, 0);
+    interrupt(16, 3699, 0, 0, 0);
+    interrupt(16, 3691, 0, 0, 0);
+    interrupt(16, 3616, 0, 0, 0);
+    interrupt(16, 3686, 0, 0, 0);
+    interrupt(16, 3701, 0, 0, 0);
+    interrupt(16, 3692, 0, 0, 0);
+    interrupt(16, 3692, 0, 0, 0);
+    break;
+  default:
+    /* default = "General error." */
+    interrupt(16, 3655, 0, 0, 0);
+    interrupt(16, 3685, 0, 0, 0);
+    interrupt(16, 3694, 0, 0, 0);
+    interrupt(16, 3685, 0, 0, 0);
+    interrupt(16, 3698, 0, 0, 0);
+    interrupt(16, 3681, 0, 0, 0);
+    interrupt(16, 3692, 0, 0, 0);
+    interrupt(16, 3616, 0, 0, 0);
+    interrupt(16, 3685, 0, 0, 0);
+    interrupt(16, 3698, 0, 0, 0);
+    interrupt(16, 3698, 0, 0, 0);
+    interrupt(16, 3695, 0, 0, 0);
+    interrupt(16, 3698, 0, 0, 0);
+  }
+  interrupt(16, 3630, 0, 0, 0);
+  interrupt(16, 3597, 0, 0, 0);
+  interrupt(16, 3594, 0, 0, 0);
+  interrupt(33, 5, 0, 0, 0);
 }
 
 void handleInterrupt21(int ax, int bx, int cx, int dx)

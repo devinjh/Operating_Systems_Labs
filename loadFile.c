@@ -130,7 +130,9 @@ int main(int argc, char* argv[])
 			}
 			else
 			{
+				/* Uncomment to debug whats being written to disk */
 				char c = fgetc(loadFil);
+				/*printf("%i\n",c );*/
 				fputc(c, floppy);
 			}	
 		}
