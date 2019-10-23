@@ -26,9 +26,6 @@
 
 void handleInterrupt21(int, int, int, int);
 void printLogo();
-void runProgram(int, int, int);
-void error(int);
-void readFile(char *fname, char *buffer, int *size);
 
 void main()
 {
@@ -150,20 +147,17 @@ void readFile(char *fname, char *buffer, int *size)
 /* ax = 4 */
 void runProgram(char *name, int segment)
 {
-  char buffer[4096];
-  int size;
+  char buffer[8192];
   int i = 0;
 
-  for(i = 0; i < 4096; ++i)buffer[i] = 0;
-
-  interrupt(33, 3, name, buffer, size); /* read from disk the program*/
+  interrupt(33, 3, name, buffer); /* read from disk the program*/
   segment *= 0x1000;
 
-  for(i = 0; i < 4096; ++i) {
+  for(i = 0; i < 8192; ++i) {
     putInMemory(segment, i, buffer[i]);
   }
 
-  launchProgram(segment);
+  launchProgram(segment); 
 }
 
 /* ax = 5 */

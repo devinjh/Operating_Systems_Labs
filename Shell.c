@@ -27,9 +27,6 @@ void main()
 
   fillShellChoices(choices);
 
-  interrupt(33, 2, buffer, 258, 1); /* load config file */
-  interrupt(33, 12, buffer[0] + 1, buffer[1] + 1, 0); /* clear screen and set colors to config colors */
-
   interrupt(33, 0, "Welcome to Andrew, Devin, and Tristans Shell! Enjoy your stay\r\n", 0, 0);
 
   while(1) {
@@ -197,6 +194,7 @@ void prnt(char *arg2)
   }
 
   interrupt(33, 3, filename, buffer, size);
+  interrupt(33, 0, buffer, 1, 0);
 }
 
 void remv(char *arg2)
@@ -242,7 +240,7 @@ void show(char *arg2)
   }
 
   interrupt(33, 3, filename, buffer, size);
-
+  interrupt(33, 0, buffer, 0, 0);
 }
 
 void twet(char *arg2)

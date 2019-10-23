@@ -18,5 +18,9 @@ dd if=config of=floppya.img bs=512 count=1 seek=258 conv=notrunc
 bcc -ansi -c -o Shell.o Shell.c
 # link the shell
 ld86 -o Shell -d Shell.o basm.o
-# put the shell program in the floppy at sector 30, give it 10 blocks of memory
-dd if=Shell of=floppya.img bs=512 count=10 seek=30 conv=notrunc
+# put shell on the disk and store the program name in dir
+./loadFile Shell
+# put ddir on the disk and in the dir (for shell command ddir)
+./loadFile ddir
+# put Stenv on the disk and in the dir (for shell command senv)
+./loadFile Stenv
