@@ -108,7 +108,7 @@ void shellCommand(char choices[][5], char *input, int numChoices)
       return;/* After you find a match, and run the function, you dont need to check anymore*/
     }
   }
-  interrupt(33,0,"bad command or file name\r\n",0,0); /* No command was matched*/
+  interrupt(33, 0, "bad command or file name\r\n", 0, 0); /* No command was matched*/
 }
 
 void boot()
@@ -153,7 +153,7 @@ void copy(char *arg2)
 
 void ddir()
 {
-  interrupt(33, 0, "Ddir was called\r\n", 0, 0);
+  interrupt(33, 4, "ddir\0", 4, 0);
 }
 
 void exec(char *arg2)
@@ -171,9 +171,7 @@ void exec(char *arg2)
     return;
   }
 
-  interrupt(33, 0, "Exec was called with filename: ", 0, 0);
-  interrupt(33, 0, filename, 0, 0);
-  interrupt(33, 0, "\r\n", 0, 0);
+  interrupt(33, 4, filename, 4, 0);
 }
 
 void help()
@@ -184,6 +182,8 @@ void help()
 void prnt(char *arg2)
 {
   char filename [80];
+  char buffer [4096];
+  int size;
   filename[0] = '\0';
 
   splitArg(arg2, filename, arg2);
@@ -196,9 +196,7 @@ void prnt(char *arg2)
     return;
   }
 
-  interrupt(33, 0, "Prnt was called with filename: ", 0, 0);
-  interrupt(33, 0, filename, 0, 0);
-  interrupt(33, 0, "\r\n", 0, 0);
+  interrupt(33, 3, filename, buffer, size);
 }
 
 void remv(char *arg2)
@@ -223,12 +221,14 @@ void remv(char *arg2)
 
 void senv()
 {
-  interrupt(33, 0, "Senv was called\r\n", 0, 0);
+  interrupt(33, 4, "Stenv\0", 4, 0);
 }
 
 void show(char *arg2)
 {
   char  filename [80];
+  char buffer [4096];
+  int size;
   filename[0] = '\0';
 
   splitArg(arg2, filename, arg2);
@@ -241,9 +241,8 @@ void show(char *arg2)
     return;
   }
 
-  interrupt(33, 0, "Show was called with filename: ", 0, 0);
-  interrupt(33, 0, filename, 0, 0);
-  interrupt(33, 0, "\r\n", 0, 0);
+  interrupt(33, 3, filename, buffer, size);
+
 }
 
 void twet(char *arg2)

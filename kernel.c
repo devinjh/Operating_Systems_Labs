@@ -33,7 +33,6 @@ void readFile(char *fname, char *buffer, int *size);
 void main()
 {
   char buffer[512];
-  int size;
   makeInterrupt21();
 
   /* Step 0 – config file */
@@ -42,8 +41,8 @@ void main()
   printLogo();
 
   /* Step 1 – load and print msg file (Lab 3) */
-  interrupt(33, 3, "msg\0", buffer, &size);
-  interrupt(33, 0, buffer, 0, 0);
+  interrupt(33, 4, "Shell\0", 2, 0);
+  interrupt(33, 0, "Bad or missing command interpreter\r\n\0", 0, 0);
   while (1);
 }
 
@@ -57,22 +56,6 @@ void printLogo()
   interrupt(33, 0, "._/'     `\\.      |____/|_|\\__,_|\\___|_|\\_\\_____/ \\____/|_____/\r\n\0", 0, 0);
   interrupt(33, 0, " BlackDOS2020 v. 1.03, c. 2019. Based on a project by M. Black. \r\n\0", 0, 0);
   interrupt(33, 0, " Author(s): Andrew Robinson, Tristan Hess, Devin Hopkins.\r\n\r\n\0", 0, 0);
-}
-
-void runProgram(int start, int size, int segment)
-{
-  char buffer[4096];
-  int i = 0;
-  for(i = 0; i < 4096; ++i)buffer[i] = 0;
-
-  interrupt(33, 2, buffer, start, size); /* read from disk the program*/
-  segment *= 0x1000;
-
-  for(i = 0; i < 4096; ++i) {
-    putInMemory(segment, i, buffer[i]);
-  }
-
-  launchProgram(segment);
 }
 
 /* ax = 0 */
@@ -161,13 +144,32 @@ void readFile(char *fname, char *buffer, int *size)
       }
     }
   }
-  interrupt(33, 0, "File not found\r\n\0", 0, 0);
+  interrupt(33, 15, 0, 0, 0);
+}
+
+/* ax = 4 */
+void runProgram(char *name, int segment)
+{
+  char buffer[4096];
+  int size;
+  int i = 0;
+
+  for(i = 0; i < 4096; ++i)buffer[i] = 0;
+
+  interrupt(33, 3, name, buffer, size); /* read from disk the program*/
+  segment *= 0x1000;
+
+  for(i = 0; i < 4096; ++i) {
+    putInMemory(segment, i, buffer[i]);
+  }
+
+  launchProgram(segment);
 }
 
 /* ax = 5 */
 void stop()
 {
-  while(1) {};
+  launchProgram(8192);
 }
 
 /* ax = 6 */
@@ -337,6 +339,9 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     break;
   case 3:
     readFile(bx, cx, dx);
+    break;
+  case 4:
+    runProgram(bx, cx);
     break;
   case 5:
     stop();
