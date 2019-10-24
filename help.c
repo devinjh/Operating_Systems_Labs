@@ -22,10 +22,10 @@ void main()
 	PRINTS("|  copy [file1] [file2]                                |\r\n\0");
 	PRINTS("|  - Copies contents of file1 to file2                 |\r\n\0");
 	PRINTS("|  ddir                                                |\r\n\0");
-        PRINTS("|  - Prints the file directory                         |\r\n\0");
+	PRINTS("|  - Prints the file directory                         |\r\n\0");
 	PRINTS("|  exec [file]                                         |\r\n\0");
-        PRINTS("|  - Executes given program                            |\r\n\0");
-        PRINTS("|  - Must be called with the first letter as capital   |\r\n\0");
+	PRINTS("|  - Executes given program                            |\r\n\0");
+	PRINTS("|  - Must be called with the first letter as capital   |\r\n\0");
 	PRINTS("|  Options:                                            |\r\n\0");
 	PRINTS("|    arg:    argument to be output                     |\r\n\0");
 	PRINTS("|    file:   filename of the desired file              |\r\n\0");
