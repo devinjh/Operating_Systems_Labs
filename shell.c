@@ -173,7 +173,7 @@ void exec(char *arg2)
 
 void help()
 {
-  interrupt(33, 0, "Help was called\r\n", 0, 0);
+  interrupt(33, 4, "Help\0", 4, 0);
 }
 
 void prnt(char *arg2)

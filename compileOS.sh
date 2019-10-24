@@ -24,3 +24,5 @@ ld86 -o Shell -d shell.o basm.o
 ./loadFile Stenv
 # put Fib on the disk and in the dir
 ./loadFile Fib
+# put Help on the disk and in the dir
+./loadFile Help
