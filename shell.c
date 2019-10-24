@@ -150,7 +150,7 @@ void copy(char *arg2)
 
 void ddir()
 {
-  interrupt(33, 4, "ddir\0", 4, 0);
+  interrupt(33, 4, "Ddir\0", 4, 0);
 }
 
 void exec(char *arg2)

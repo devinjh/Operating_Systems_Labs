@@ -132,7 +132,7 @@ void readFile(char *fname, char *buffer, int *size)
 
   for(file_num = 0; file_num < 32; ++file_num) {
     for(i = 0; i < 8; ++i) {
-      if(fname[i] == '\0' && directory[i] == '\0') {
+      if(fname[i] == '\0' && directory[i+ 16 * file_num] == '\0') {
         interrupt(33, 2, buffer, directory[16 * file_num + 8], directory[16 * file_num + 9]);
         return;
       }

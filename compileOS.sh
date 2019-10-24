@@ -4,8 +4,6 @@ dd if=/dev/zero of=floppya.img bs=512 count=2880
 dd if=bootload of=floppya.img bs=512 count=1 conv=notrunc
 # put map into floppy at sector 256
 dd if=map of=floppya.img bs=512 count=1 seek=256 conv=notrunc
-# compile loadFile
-gcc -o loadFile loadFile.c
 # compile kernel
 bcc -ansi -c -o kernel.o kernel.c
 # link kernel
@@ -15,7 +13,7 @@ dd if=kernel of=floppya.img bs=512 conv=notrunc seek=259
 # put config file into floppy at sector 258, config has background and foreground colors
 dd if=config of=floppya.img bs=512 count=1 seek=258 conv=notrunc
 # compile the shell
-bcc -ansi -c -o shell.o shel.c
+bcc -ansi -c -o shell.o shell.c
 # link the shell
 ld86 -o Shell -d shell.o basm.o
 # put shell on the disk and store the program name in dir
@@ -24,3 +22,5 @@ ld86 -o Shell -d shell.o basm.o
 ./loadFile Ddir
 # put Stenv on the disk and in the dir (for shell command senv)
 ./loadFile Stenv
+# put Fib on the disk and in the dir
+./loadFile Fib
