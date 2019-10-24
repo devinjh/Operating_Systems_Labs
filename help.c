@@ -1,5 +1,6 @@
 /*       Help program         */
-/* Created by Andrew Robinson */
+/* Created by Andrew Robinson,*/ 
+/* Tristan Hess, Devin Hopkins*/
 /* for use in blackdos 2019   */
 
 #include "blackdos.h"
@@ -8,20 +9,28 @@ void main()
 {
 	char * input;
 
-	CLRS;
 	PRINTS("\r\n\0");
+	PRINTS(" ______________________________________________________\r\n\0");
 	PRINTS("|                        Page 1                        |\r\n\0");
-	PRINTS("|                       Commands_______________________|\r\n\0");
-	PRINTS("|__boot________________________________________________|\r\n\0");
-	PRINTS("|__- Restarts the computer_____________________________|\r\n\0");
-	PRINTS("|__clrs________________________________________________|\r\n\0");
-	PRINTS("|__- Clears the screen_________________________________|\r\n\0");
-	PRINTS("|__echo [-arg]_________________________________________|\r\n\0");
-	PRINTS("|__- Writes the argument to the standard output _______|\r\n\0");
-	PRINTS("|__Options:____________________________________________|\r\n\0");
-	PRINTS("|__-arg    arg to be output____________________________|\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________Press Return For Next Page______________|\r\n\0");
+	PRINTS("|                       Commands                       |\r\n\0");
+	PRINTS("|  boot                                                |\r\n\0");
+	PRINTS("|  - Restarts the computer                             |\r\n\0");
+	PRINTS("|  clrs                                                |\r\n\0");
+	PRINTS("|  - Clears the screen                                 |\r\n\0");
+	PRINTS("|  echo [arg]                                          |\r\n\0");
+	PRINTS("|  - Writes the argument to the standard output        |\r\n\0");
+	PRINTS("|  copy [file1] [file2]                                |\r\n\0");
+	PRINTS("|  - Copies contents of file1 to file2                 |\r\n\0");
+	PRINTS("|  ddir                                                |\r\n\0");
+        PRINTS("|  - Prints the file directory                         |\r\n\0");
+	PRINTS("|  exec [file]                                         |\r\n\0");
+        PRINTS("|  - Executes given program                            |\r\n\0");
+        PRINTS("|  - Must be called with the first letter as capital   |\r\n\0");
+	PRINTS("|  Options:                                            |\r\n\0");
+	PRINTS("|    arg:    argument to be output                     |\r\n\0");
+	PRINTS("|    file:   filename of the desired file              |\r\n\0");
+	PRINTS("|                                                      |\r\n\0");
+	PRINTS("|_____________Press [ENTER] For Next Page______________|\r\n\0");
 
 	while(*input != 0xD)
 	{
@@ -29,20 +38,28 @@ void main()
 	}
 	*input = 0x0;
 
-	CLRS;
 	PRINTS("\r\n\0");
-	PRINTS("_________________________Page 2________________________\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________________________________________________|\r\n\0");
-	PRINTS("|______________Press Return For Next Page______________|\r\n\0");
+	PRINTS(" ______________________________________________________\r\n\0");
+	PRINTS("|                        Page 2                        |\r\n\0");
+	PRINTS("|                       Commands                       |\r\n\0");
+	PRINTS("|  help                                                |\r\n\0");
+	PRINTS("|  - Displays help manual of possible commands         |\r\n\0");
+	PRINTS("|  prnt [file]                                         |\r\n\0");
+	PRINTS("|  - Sends contents of given file to printer           |\r\n\0");
+	PRINTS("|  remv [file]                                         |\r\n\0");
+	PRINTS("|  - Deletes file with the given file                  |\r\n\0");
+	PRINTS("|  senv                                                |\r\n\0");
+	PRINTS("|  - Set environment variables                         |\r\n\0");
+	PRINTS("|  show [file]                                         |\r\n\0");
+	PRINTS("|  - Displays contents of the given file               |\r\n\0");
+	PRINTS("|  twet [file]                                         |\r\n\0");
+	PRINTS("|  - Create a text file with the given filename        |\r\n\0");
+	PRINTS("|  Options:                                            |\r\n\0");
+	PRINTS("|    file:   filename of desired file                  |\r\n\0");
+	PRINTS("|                                                      |\r\n\0");
+	PRINTS("|                                                      |\r\n\0");
+	PRINTS("|                                                      |\r\n\0");
+	PRINTS("|_____________Press [ENTER] to close help______________|\r\n\0");
 
 	while(*input != 0xD)
 	{
