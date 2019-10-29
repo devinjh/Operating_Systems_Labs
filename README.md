@@ -11,7 +11,8 @@ We rewrote our previously implemented function runProgram(). It now takes a file
 Lastly, we updated our shell by implementing several of the previously non-implemented commands. These commands were ddir, exec, help, prnt, senv, and show. All of these commands used the file directory we set up in the kernel, excluding help. Help was derived by simply creating a user's manual to our kernel.
 
 In order to run this program. First run the shell script
-./compileOS
+./compileOS.sh
+./compileHelp.sh
 then run
 echo 'c' | bochs -f bdos.txt
 to begin BlackDOS
