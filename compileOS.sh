@@ -26,3 +26,6 @@ ld86 -o Shell -d shell.o basm.o
 ./loadFile Fib
 # put Help on the disk and in the dir
 ./loadFile Help
+# put both of these programs onto the disk and the directory per request
+./loadFile T3
+./loadFile Cal

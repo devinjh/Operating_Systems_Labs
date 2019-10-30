@@ -27,10 +27,10 @@ void main()
 
   fillShellChoices(choices);
 
-  interrupt(33, 0, "Welcome to Andrew, Devin, and Tristans Shell! Enjoy your stay\r\n", 0, 0);
+  interrupt(33, 0, "Welcome to Andrew, Devin, and Tristans Shell! Enjoy your stay\r\n\0", 0, 0);
 
   while(1) {
-    interrupt(33, 0, "^(~(oo)~)^\s", 0, 0); /* Obligatory year of the pig thing*/
+    interrupt(33, 0, "^(~(oo)~)^\0", 0, 0); /* Obligatory year of the pig thing*/
     interrupt(33, 1, buffer, 0, 0); /* let the user input a command*/
     shellCommand(choices, buffer, numChoices); /* process the command*/
   }
@@ -105,7 +105,7 @@ void shellCommand(char choices[][5], char *input, int numChoices)
       return;/* After you find a match, and run the function, you dont need to check anymore*/
     }
   }
-  interrupt(33, 0, "bad command or file name\r\n", 0, 0); /* No command was matched*/
+  interrupt(33, 0, "bad command or file name\r\n\0", 0, 0); /* No command was matched*/
 }
 
 void boot()

@@ -12,7 +12,6 @@ Lastly, we updated our shell by implementing several of the previously non-imple
 
 In order to run this program. First run the shell script
 ./compileOS.sh
-./compileHelp.sh
 then run
 echo 'c' | bochs -f bdos.txt
 to begin BlackDOS
