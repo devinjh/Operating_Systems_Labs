@@ -189,6 +189,7 @@ void writeFile(char* name, char* buffer, int numberOfSectors)
     for (i = 0; i < 8; ++i) {
       if(name[i] == '\0' && directory[i+ 16 * file_num] == '\0') {
         interrupt(33, 15, 1, 0, 0);
+	return;
       }
       else {
         interrupt(33, 0, "find and note a free directory entry\r\n\0", 0, 0);
