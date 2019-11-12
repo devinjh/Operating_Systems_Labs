@@ -18,13 +18,12 @@ void remv(char *);
 void senv();
 void show(char *);
 void twet(char *);
-void lab7();
 
 void main()
 {
-  int numChoices = 13;
+  int numChoices = 12;
   char buffer[512];
-  char choices[13][5]; /* Commands are always 4 characters max and one character for the null terminator*/
+  char choices[12][5]; /* Commands are always 4 characters max and one character for the null terminator*/
 
   fillShellChoices(choices);
 
@@ -53,7 +52,6 @@ void fillShellChoices(char choices[][5])
   fillStr(&choices[9][0], 5, "senv\0");
   fillStr(&choices[10][0], 5, "show\0");
   fillStr(&choices[11][0], 5, "twet\0");
-  fillStr(&choices[12][0], 5, "lab7\0");
 }
 
 void shellCommand(char choices[][5], char *input, int numChoices)
@@ -103,9 +101,6 @@ void shellCommand(char choices[][5], char *input, int numChoices)
       case 11:
         twet(arg2);
         break;
-      case 12:
-	lab7();
-	break;
       }
       return;/* After you find a match, and run the function, you dont need to check anymore*/
     }
@@ -132,6 +127,7 @@ void echo(char *arg2)
 void copy(char *arg2)
 {
   char file1[80], file2[80], extra[80];
+  char buffer[12288]; int size;
   file1[0] = '\0';
   file2[0] = '\0';
 
@@ -142,15 +138,11 @@ void copy(char *arg2)
     interrupt(33, 0, "Copy was called with too many arguments\r\n", 0, 0);
     return;
   }
-  if(file2[0] == '\0' || file1[0] == '\0') {
-    interrupt(33, 0, "Copy was called with too few arguments\r\n", 0, 0);
-    return;
-  }
-  interrupt(33, 0, "Copy was called with files: ", 0, 0);
-  interrupt(33, 0, file1, 0, 0);
-  interrupt(33, 0, " and ", 0, 0);
-  interrupt(33, 0, file2, 0, 0);
-  interrupt(33, 0, "\r\n", 0, 0);
+
+  interrupt(33, 3, file1, buffer, &size);
+  interrupt(33, 8, file2, buffer, size);
+
+  return;
 }
 
 void ddir()
@@ -217,9 +209,7 @@ void remv(char *arg2)
     return;
   }
 
-  interrupt(33, 0, "Remv was called with filename: ", 0, 0);
-  interrupt(33, 0, filename, 0, 0);
-  interrupt(33, 0, "\r\n", 0, 0);
+  interrupt(33, 7,filename,0,0);
 }
 
 void senv()
@@ -244,7 +234,7 @@ void show(char *arg2)
     return;
   }
 
-  interrupt(33, 3, filename, buffer, size);
+  interrupt(33, 3, filename, buffer, &size);
   interrupt(33, 0, buffer, 0, 0);
 }
 
@@ -266,11 +256,6 @@ void twet(char *arg2)
   interrupt(33, 0, "Twet was called with filename: ", 0, 0);
   interrupt(33, 0, filename, 0, 0);
   interrupt(33, 0, "\r\n", 0, 0);
-}
-
-void lab7()
-{
-  interrupt(33, 4, "Lab7\0", 4, 0);
 }
 
 /* Splits the char* buffer into two args based on the first space */

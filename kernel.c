@@ -264,7 +264,7 @@ void writeFile(char *name, char *buffer, int numberOfSectors)
         interrupt(33, 15, 1, 0, 0);
         return;
       }
-      if(name[i] == '\0' || directory[i + 16 * file_num] == '\0') {
+      if(name[i] != directory[i + 16 * file_num]) {
         break;
       }
     }
