@@ -175,6 +175,31 @@ void writeSector(char *buffer, int sector, int sectorCount)
   interrupt(19, 3 * 256 + sectorCount, buffer, trackNo * 256 + relSecNo, headNo * 256);
 }
 
+/* ax = 7 */
+
+/* ax = 8 */
+void writeFile(char* name, char* buffer, int numberOfSectors)
+{
+  char directory[512];
+  char map[512];
+  int i = 0, file_num = 0;
+  interrupt(33, 2, directory, 257, 1);
+  
+  for(file_num = 0; file_num < 32; ++file_num) {
+    for (i = 0; i < 8; ++i) {
+      if(name[i] == '\0' && directory[i+ 16 * file_num] == '\0') {
+        interrupt(33, 15, 1, 0, 0);
+	return;
+      }
+      else {
+        interrupt(33, 0, "find and note a free directory entry\r\n\0", 0, 0);
+      }
+    }
+  }
+
+  interrupt(33, 2, map, 256, 1);
+}
+
 /* ax = 12 */
 void clearScreen(bx, cx)
 {
@@ -342,6 +367,9 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     break;
   case 6:
     writeSector(bx, cx, dx);
+    break;
+  case 8:
+    writeFile(bx, cx, dx);
     break;
   case 12:
     clearScreen(bx, cx);
