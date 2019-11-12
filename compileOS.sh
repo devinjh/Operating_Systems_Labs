@@ -23,9 +23,9 @@ ld86 -o Shell -d shell.o basm.o
 # put Stenv on the disk and in the dir (for shell command senv)
 ./loadFile Stenv
 # put Fib on the disk and in the dir
-./loadFile Fib
+./loadFile fib
 # put Help on the disk and in the dir
 ./loadFile Help
 # put both of these programs onto the disk and the directory per request
-./loadFile T3
-./loadFile Cal
+./loadFile t3
+./loadFile cal
