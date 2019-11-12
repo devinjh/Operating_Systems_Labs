@@ -84,7 +84,7 @@ void readString(char *buffer)
   int i = 0;
   char *input;
 
-  while(i != 79) {
+  while(i != 139) {
     *input = interrupt(22, 0, 0, 0, 0);
 
     switch(*input) {
@@ -110,7 +110,7 @@ void readString(char *buffer)
 
   interrupt(16, 14 * 256 + '\n', 0, 0, 0); /* print new line */
   interrupt(16, 14 * 256 + '\r', 0, 0, 0); /* return to the beginning of the line */
-  buffer[79] = '\0'; /* if you read 79 characters, set 80 to '\0' */
+  buffer[139] = '\0'; /* if you read 140 characters, set 80 to '\0' */
   return;
 }
 
@@ -240,6 +240,14 @@ void writeFile(char *name, char *buffer, int numberOfSectors)
         if(empty_spot == numberOfSectors) {
           /* set file name*/
           for(i = 0; i < 8; ++i) {
+            if(name[i] == '\0')
+            {
+              for(;i<8;++i)
+              {
+                directory[i + 16 * file_num] = 0x00;
+              }
+              break;
+            }
             directory[i + 16 * file_num] = name[i];
           }
           directory[16 * file_num + 8] = j + 1 - numberOfSectors; /* sector number*/

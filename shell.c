@@ -240,7 +240,7 @@ void show(char *arg2)
 
 void twet(char *arg2)
 {
-  char  filename [80];
+  char  filename [80], buffer[140];
   filename[0] = '\0';
 
   splitArg(arg2, filename, arg2);
@@ -253,9 +253,15 @@ void twet(char *arg2)
     return;
   }
 
-  interrupt(33, 0, "Twet was called with filename: ", 0, 0);
-  interrupt(33, 0, filename, 0, 0);
-  interrupt(33, 0, "\r\n", 0, 0);
+  if(filename[0] >= 'A' && filename[0] <= 'Z')
+  {
+    interrupt(33,15,2,0,0);
+    return;
+  }
+
+  interrupt(33,0,"Enter your tweet (140 characters)\0\n",0,0);
+  interrupt(33,1,buffer,0,0);
+  interrupt(33,8,filename,buffer,1);
 }
 
 /* Splits the char* buffer into two args based on the first space */
