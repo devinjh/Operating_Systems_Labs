@@ -124,7 +124,7 @@ void readSector(char *buffer, int sector, int sectorCount)
 }
 
 /* ax = 3 */
-void readFile(char *fname, char *buffer, int *size)
+void readFile(char *fname, char *buffer, int* size)
 {
   char directory[512];
   int i = 0, file_num = 0;
@@ -134,6 +134,7 @@ void readFile(char *fname, char *buffer, int *size)
     for(i = 0; i < 8; ++i) {
       if(fname[i] == '\0' && directory[i + 16 * file_num] == '\0') {
         interrupt(33, 2, buffer, directory[16 * file_num + 8], directory[16 * file_num + 9]);
+        *size = directory[16*file_num+9];
         return;
       }
       if(fname[i] != directory[i + 16 * file_num]) {
@@ -149,8 +150,9 @@ void runProgram(char *name, int segment)
 {
   char buffer[8192];
   int i = 0;
+  int size;
 
-  interrupt(33, 3, name, buffer); /* read from disk the program*/
+  interrupt(33, 3, name, buffer, &size); /* read from disk the program*/
   segment *= 0x1000;
 
   for(i = 0; i < 8192; ++i) {
