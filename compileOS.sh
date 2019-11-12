@@ -16,10 +16,6 @@ dd if=config of=floppya.img bs=512 count=1 seek=258 conv=notrunc
 bcc -ansi -c -o shell.o shell.c
 # link the shell
 ld86 -o Shell -d shell.o basm.o
-# compile lab7.c
-bcc -ansi -c -o lab7.o lab7.c
-# link lab7
-ld86 -o Lab7 -d lab7.o basm.o
 # put shell on the disk and store the program name in dir
 ./loadFile Shell
 # put ddir on the disk and in the dir (for shell command ddir)
@@ -31,13 +27,8 @@ ld86 -o Lab7 -d lab7.o basm.o
 # put Help on the disk and in the dir
 ./loadFile Help
 # put both of these programs onto the disk and the directory per request
-<<<<<<< HEAD
 ./loadFile t3
 ./loadFile cal
-=======
-./loadFile T3
-./loadFile Cal
 # put Lab7 programs on the disk in the dir
-./loadFile Lab7
+./loadFile lab7
 ./loadFile fpc02
->>>>>>> 4072b5d2b6c9b4898d2288eec992dc16e9bb8aea

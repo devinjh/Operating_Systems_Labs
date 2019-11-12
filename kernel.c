@@ -132,7 +132,7 @@ void readFile(char *fname, char *buffer, int *size)
 
   for(file_num = 0; file_num < 32; ++file_num) {
     for(i = 0; i < 8; ++i) {
-      if(fname[i] == '\0' && directory[i+ 16 * file_num] == '\0') {
+      if(fname[i] == '\0' && directory[i + 16 * file_num] == '\0') {
         interrupt(33, 2, buffer, directory[16 * file_num + 8], directory[16 * file_num + 9]);
         return;
       }
@@ -157,7 +157,7 @@ void runProgram(char *name, int segment)
     putInMemory(segment, i, buffer[i]);
   }
 
-  launchProgram(segment); 
+  launchProgram(segment);
 }
 
 /* ax = 5 */
@@ -176,28 +176,97 @@ void writeSector(char *buffer, int sector, int sectorCount)
 }
 
 /* ax = 7 */
-
-/* ax = 8 */
-void writeFile(char* name, char* buffer, int numberOfSectors)
+void deleteFile(char *name)
 {
   char directory[512];
   char map[512];
-  int i = 0, file_num = 0;
+  int i = 0, sector_num, sector_length, file_num = 0;
   interrupt(33, 2, directory, 257, 1);
-  
+  interrupt(33, 2, map, 256, 1);
+
   for(file_num = 0; file_num < 32; ++file_num) {
-    for (i = 0; i < 8; ++i) {
-      if(name[i] == '\0' && directory[i+ 16 * file_num] == '\0') {
-        interrupt(33, 15, 1, 0, 0);
-	return;
+    for(i = 0; i < 8; ++i) {
+      if(name[i] == '\0' && directory[i + 16 * file_num] == '\0') {
+        sector_num = directory[16*file_num+8];
+        sector_length = directory[16*file_num+9];
+        for(i = sector_num;i < sector_num+sector_length;++i)
+        {
+          map[i] = 0x00;
+        }
+        directory[16*file_num]= 0x00;
+        interrupt(33,6,map,256,1);
+        interrupt(33,6,directory,257,1);
+        return;
       }
-      else {
-        interrupt(33, 0, "find and note a free directory entry\r\n\0", 0, 0);
+      if(name[i] != directory[i + 16 * file_num]) {
+        break;
       }
     }
   }
 
+  interrupt(33,15,0,0,0);
+}
+
+/* ax = 8 */
+void writeFile(char *name, char *buffer, int numberOfSectors)
+{
+  char directory[512];
+  char map[512];
+  int i = 0, j = 0, empty_spot = -1, file_num = 0;
+  interrupt(33, 2, directory, 257, 1);
   interrupt(33, 2, map, 256, 1);
+
+  for(file_num = 0; file_num < 32; ++file_num) {
+    /* this is an empty directory spot*/
+    if(directory[16 * file_num] == '\0') {
+
+      for(j = 0; j < 512; ++j) {
+        /* we found an empty sector*/
+        if(map[j] == 0) {
+          if(empty_spot == -1) {
+            empty_spot = 1;
+          }
+          else {
+            empty_spot += 1;
+          }
+        }
+        else {
+          empty_spot = -1;
+        }
+
+        /* found enough contiguous memory*/
+        if(empty_spot == numberOfSectors) {
+          /* set file name*/
+          for(i = 0; i < 8; ++i) {
+            directory[i + 16 * file_num] = name[i];
+          }
+          directory[16 * file_num + 8] = j + 1 - numberOfSectors; /* sector number*/
+          directory[16 * file_num + 9] = numberOfSectors; /* number of sectors*/
+          interrupt(33, 6, buffer, j + 1 - numberOfSectors, numberOfSectors); /* write the file*/
+          for(i = 0; i < numberOfSectors; ++i) {
+            map[i + j + 1 - numberOfSectors] = 0xff;
+          }
+
+          interrupt(33, 6, map, 256, 1);
+          interrupt(33, 6, directory, 257, 1);
+          return;
+        }
+      }
+      /* not enough memory*/
+      interrupt(33, 15, 2, 0, 0);
+      return;
+    }
+
+    for (i = 0; i < 8; ++i) {
+      if(name[i] == '\0' && directory[i + 16 * file_num] == '\0') {
+        interrupt(33, 15, 1, 0, 0);
+        return;
+      }
+      if(name[i] == '\0' || directory[i + 16 * file_num] == '\0') {
+        break;
+      }
+    }
+  }
 }
 
 /* ax = 12 */
@@ -367,6 +436,9 @@ void handleInterrupt21(int ax, int bx, int cx, int dx)
     break;
   case 6:
     writeSector(bx, cx, dx);
+    break;
+  case 7:
+    deleteFile(bx);
     break;
   case 8:
     writeFile(bx, cx, dx);
