@@ -1,0 +1,5 @@
+*.out
+kernel.o
+*.asm
+*.img
+kernel
